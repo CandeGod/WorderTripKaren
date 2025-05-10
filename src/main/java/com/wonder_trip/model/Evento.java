@@ -1,5 +1,7 @@
 package com.wonder_trip.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,32 +10,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name = "sitios_turisticos")
-@Getter
-@Setter
+@Table(name = "eventos")
+@Data
 @NoArgsConstructor
-public class TouristSite {
+@AllArgsConstructor
+@Builder
+public class Evento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_sitio")
-    private Integer id;
+    @Column(name = "id_evento")
+    private Integer idEvento;
 
     @Column(nullable = false, length = 100)
-    private String nombre;
+    private String titulo;
 
     @Column(length = 255)
     private String descripcion;
 
-    @Column(length = 150)
-    private String ubicacion;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
 
     @ManyToOne
-    @JoinColumn(name = "id_hotel")
-    private Hotel hotel;
+    @JoinColumn(name = "id_sitio")
+    private SitioTuristico sitioTuristico;
 }

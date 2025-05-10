@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class TouristSiteDTO {
+public class SitioTuristicoDTO {
 
     @PositiveOrZero(message = "El ID no puede ser negativo.")
     private Integer id;
