@@ -94,6 +94,13 @@ public class PaqueteService implements IPaqueteService {
         return repository.findBySitiosId(sitioId).stream().map(this::toConSitiosDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public PaqueteConSitiosDTO getConSitiosById(Integer id) {
+        Paquete paquete = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paquete no encontrado con ID: " + id));
+        return toConSitiosDTO(paquete);
+    }
+
     private PaqueteDTO toDTO(Paquete entity) {
         PaqueteDTO dto = new PaqueteDTO();
         dto.setId(entity.getId());

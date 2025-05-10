@@ -18,4 +18,5 @@ public interface IPaqueteService {
 
     List<PaqueteConSitiosDTO> getAllWithSitios();
     List<PaqueteConSitiosDTO> findBySitio(Integer sitioId);
+    PaqueteConSitiosDTO getConSitiosById(Integer id);
 }
