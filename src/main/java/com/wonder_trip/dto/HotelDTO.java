@@ -21,4 +21,6 @@ public class HotelDTO {
 
     @Size(max = 1000, message = "La descripción es demasiado larga.")
     private String descripcion;
+
+    private String imagenPrincipal;
 }

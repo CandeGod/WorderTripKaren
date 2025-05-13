@@ -80,6 +80,7 @@ public class SitioTuristicoService implements ISitioTuristicoService{
         dto.setDescripcion(site.getDescripcion());
         dto.setUbicacion(site.getUbicacion());
         dto.setHotelId(site.getHotel().getId());
+        dto.setImagenPrincipal(site.getImagenPrincipal());
         return dto;
     }
 }

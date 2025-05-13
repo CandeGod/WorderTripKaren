@@ -31,5 +31,5 @@ public class EventoDTO {
     @NotNull(message = "El ID del sitio turístico es obligatorio")
     private Integer idSitio;
 
-    private List<Integer> idsImagenes;
+     private String imagenCartel;
 }

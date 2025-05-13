@@ -23,4 +23,7 @@ public class Hotel {
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
+
+    @Column(name = "imagen_principal")
+    private String imagenPrincipal;
 }

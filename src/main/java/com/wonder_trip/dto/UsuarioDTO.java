@@ -38,4 +38,6 @@ public class UsuarioDTO {
     
     private List<ReporteDTO> reportes;
 
+     private String imagenPerfil; 
+
 }

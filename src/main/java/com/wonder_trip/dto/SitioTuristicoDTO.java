@@ -26,4 +26,7 @@ public class SitioTuristicoDTO {
     @NotNull(message = "Debe especificarse el ID del hotel.")
     @Positive(message = "El ID del hotel debe ser un número positivo.")
     private Integer hotelId;
+
+     @NotBlank(message = "La imagen principal es obligatoria")
+    private String imagenPrincipal;
 }

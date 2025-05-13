@@ -35,4 +35,6 @@ public class TourDTO {
 
     @NotNull(message = "El ID del sitio turístico es obligatorio")
     private Integer idSitio;
+
+     private String imagenPortada;
 }

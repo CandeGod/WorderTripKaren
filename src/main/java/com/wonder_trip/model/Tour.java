@@ -39,4 +39,7 @@ public class Tour {
     @ManyToOne
     @JoinColumn(name = "id_sitio")
     private SitioTuristico sitioTuristico;
+
+    @Column(name = "imagen_portada")
+    private String imagenPortada; 
 }

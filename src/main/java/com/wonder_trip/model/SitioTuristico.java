@@ -36,4 +36,7 @@ public class SitioTuristico {
     @ManyToOne
     @JoinColumn(name = "id_hotel")
     private Hotel hotel;
+
+    @Column(name = "imagen_principal", nullable = false)
+    private String imagenPrincipal;
 }

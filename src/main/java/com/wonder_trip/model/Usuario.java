@@ -47,4 +47,6 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Reporte> reportes;
 
+    @Column(name = "imagen_perfil")
+    private String imagenPerfil;
 }
