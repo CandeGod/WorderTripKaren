@@ -48,6 +48,4 @@ public class Evento {
     @JoinColumn(name = "id_sitio")
     private SitioTuristico sitioTuristico;
 
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Imagen> imagenes = new ArrayList<>();
 }
