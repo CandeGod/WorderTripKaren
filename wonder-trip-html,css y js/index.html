@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Inicio de Sesión - Wondertrip</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="css/auth/layout.css">
+    <link rel="stylesheet" href="css/auth/forms.css">
 </head>
 <body>
     <div class="container" id="container">
@@ -36,7 +37,7 @@
             </form>
         </div>
 
-        <!-- Formulario de registro actualizado para el endpoint -->
+        <!-- Formulario de registro -->
         <div class="form-container register-container">
             <form id="registerForm">
                 <h1>✈️ Únete a Wondertrip</h1>
@@ -66,7 +67,7 @@
             </form>
         </div>
 
-        <!-- Contenedor de la superposición -->
+        <!-- Overlay -->
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
@@ -83,6 +84,8 @@
         </div>
     </div>
 
-    <script src="../js/script.js"></script>
+    <script src="js/auth/login.js" type="module"></script>
+    <script src="js/auth/register.js" type="module"></script>
+    <script src="js/shared/utils.js" type="module"></script>
 </body>
 </html>
