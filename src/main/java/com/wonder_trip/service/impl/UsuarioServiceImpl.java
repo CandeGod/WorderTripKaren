@@ -70,4 +70,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
         repository.delete(usuario);
     }
+
+
+
+     // Método para autenticar al usuario
+    public UsuarioDTO authenticateUser(String correo, String contrasena, String rol) {
+        Usuario usuario = repository.findByCorreo(correo)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con correo: " + correo));
+
+        // Validar la contraseña y el rol
+        if (usuario.getContrasena().equals(contrasena) && usuario.getRol().equals(rol)) {
+            return modelMapper.map(usuario, UsuarioDTO.class);  // Autenticación exitosa
+        }
+        return null;  // Credenciales o rol incorrecto
+    }
 }

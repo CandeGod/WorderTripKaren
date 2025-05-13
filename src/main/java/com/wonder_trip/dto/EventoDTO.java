@@ -1,5 +1,7 @@
 package com.wonder_trip.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,4 +30,6 @@ public class EventoDTO {
 
     @NotNull(message = "El ID del sitio turístico es obligatorio")
     private Integer idSitio;
+
+    private List<Integer> idsImagenes;
 }

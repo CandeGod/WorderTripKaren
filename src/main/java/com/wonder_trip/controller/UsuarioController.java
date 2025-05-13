@@ -2,6 +2,7 @@ package com.wonder_trip.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wonder_trip.dto.LoginRequest;
 import com.wonder_trip.dto.UsuarioDTO;
 import com.wonder_trip.service.IUsuarioService;
+import com.wonder_trip.service.impl.UsuarioServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioController {
 
     private final IUsuarioService service;
+    private final UsuarioServiceImpl serviceimpl;
 
     @Operation(summary = "Crear un nuevo usuario")
     @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente")
@@ -64,5 +68,20 @@ public class UsuarioController {
     public ResponseEntity<Void> deleteUsuario(@PathVariable @Min(1) Integer id) {
         service.deleteUsuario(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+     @Operation(summary = "Autenticar un usuario")
+    @ApiResponse(responseCode = "200", description = "Usuario autenticado")
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioDTO> loginUsuario(@RequestBody LoginRequest loginRequest) {
+        // Validar las credenciales (correo y contraseña) y obtener el usuario con su rol
+        UsuarioDTO usuarioDTO = serviceimpl.authenticateUser(loginRequest.getCorreo(), loginRequest.getContrasena(), loginRequest.getRol());
+        
+        if (usuarioDTO != null) {
+            return ResponseEntity.ok(usuarioDTO);  // Autenticación exitosa
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // Credenciales incorrectas
+        }
     }
 }
