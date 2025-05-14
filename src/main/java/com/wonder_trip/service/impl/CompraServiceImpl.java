@@ -54,6 +54,15 @@ public class CompraServiceImpl implements ICompraService {
     }
 
     @Override
+    public List<CompraConDetallesDTO> getComprasByUsuarioId(Integer usuarioId) {
+        log.info("Buscando compras para usuario con ID: {}", usuarioId);
+        List<Compra> compras = compraRepository.findByUsuarioId(usuarioId);
+        return compras.stream()
+                .map(compra -> modelMapper.map(compra, CompraConDetallesDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public CompraConDetallesDTO getCompraById(Integer id) {
         Compra compra = compraRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Compra no encontrada"));

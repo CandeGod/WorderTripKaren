@@ -16,4 +16,6 @@ public interface IReporteService {
     ReporteDTO update(Integer id, ReporteDTO dto);
 
     void delete(Integer id);
+
+    Page<ReporteDTO> getByUsuarioId(Integer usuarioId, Pageable pageable);
 }

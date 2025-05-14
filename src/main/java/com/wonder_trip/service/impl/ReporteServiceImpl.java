@@ -76,4 +76,15 @@ public class ReporteServiceImpl implements IReporteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado con ID: " + id));
         reporteRepository.delete(reporte);
     }
+
+    @Override
+    public Page<ReporteDTO> getByUsuarioId(Integer usuarioId, Pageable pageable) {
+        // Verificar primero que el usuario existe
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new ResourceNotFoundException("Usuario no encontrado con ID: " + usuarioId);
+        }
+        
+        return reporteRepository.findByUsuarioId(usuarioId, pageable)
+                .map(reporte -> modelMapper.map(reporte, ReporteDTO.class));
+    }
 }

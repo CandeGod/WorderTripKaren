@@ -50,4 +50,12 @@ public class ReporteController {
         reporteService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Obtener reportes por ID de usuario")
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<Page<ReporteDTO>> getByUsuarioId(
+            @PathVariable Integer usuarioId,
+            Pageable pageable) {
+        return ResponseEntity.ok(reporteService.getByUsuarioId(usuarioId, pageable));
+    }
 }

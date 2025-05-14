@@ -18,6 +18,7 @@ import com.wonder_trip.dto.CompraDTO;
 import com.wonder_trip.service.ICompraService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,13 @@ public class CompraController {
     public ResponseEntity<CompraConDetallesDTO> crear(@Valid @RequestBody CompraDTO dto) {
         return ResponseEntity.ok(service.createCompra(dto));
     }
+
+    @Operation(summary = "Obtener compras de un usuario")
+@ApiResponse(responseCode = "200", description = "Lista de compras del usuario")
+@GetMapping("/{id}/compras")
+public ResponseEntity<List<CompraConDetallesDTO>> getComprasByUsuarioId(@PathVariable Integer id) {
+    return ResponseEntity.ok(service.getComprasByUsuarioId(id));
+}
 
     @Operation(summary = "Obtener una compra por ID")
     @GetMapping("/{id}")

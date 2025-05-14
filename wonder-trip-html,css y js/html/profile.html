@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Wondertrip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/shared/variables.css">
+    <link rel="stylesheet" href="../css/shared/layout.css">
+    <link rel="stylesheet" href="../css/shared/components.css">
+    <link rel="stylesheet" href="../css/pages/profile.css">
+    <link rel="stylesheet" href="../css/user/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🌍 Wondertrip</h1>
+                <p>Explora, descubre, vive</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="user_dashboard.html"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="user_dashboard.html#eventos"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="user_dashboard.html#sitios"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li><a href="packages.html"><i class="fas fa-suitcase"></i> Paquetes Turísticos</a></li>
+                    <li><a href="purchases.html"><i class="fas fa-receipt"></i> Mis Compras</a></li>
+                    <li class="active"><a href="profile.html"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h2 id="welcomeMessage">Mi Perfil</h2>
+            </header>
+
+            <section class="profile-section">
+                <div class="profile-container">
+                    <!-- Sección de información del usuario -->
+                    <div class="profile-info">
+                        <div class="profile-header">
+                            <div class="profile-image-container">
+                                <img id="profileImage" src="" alt="Foto de perfil">
+                                <button id="changeImageBtn" class="icon-btn">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+
+                        <form id="profileForm" class="profile-form">
+                            <div class="form-group">
+                                <label for="name">Nombre completo</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Género</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Correo electrónico</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Contraseña</label>
+                                <div class="password-input">
+                                    <input type="password" id="password" name="password" required>
+                                    <button type="button" id="togglePassword" class="icon-btn">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="cancelBtn" class="secondary-btn">Cancelar</button>
+                                <button type="submit" id="saveBtn" class="primary-btn">Guardar cambios</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Sección de reportes -->
+                    <div class="profile-reports">
+                        <div class="section-header">
+                            <h3>Mis Reportes</h3>
+                            <button id="newReportBtn" class="primary-btn">
+                                <i class="fas fa-plus"></i> Nuevo Reporte
+                            </button>
+                        </div>
+                        
+                        <div class="reports-list" id="reportsList">
+                            <!-- Los reportes se cargarán aquí dinámicamente -->
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Cargando reportes...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para nuevo reporte -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Nuevo Reporte</h3>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="reportTitle">Título</label>
+                    <input type="text" id="reportTitle" name="reportTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="reportDescription">Descripción</label>
+                    <textarea id="reportDescription" name="reportDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancelReportBtn" class="secondary-btn">Cancelar</button>
+                    <button type="submit" class="primary-btn">Enviar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/user/profile.js" type="module"></script>
+    <script src="../js/shared/utils.js" type="module"></script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import com.wonder_trip.dto.CompraDTO;
 
 public interface ICompraService {
     CompraConDetallesDTO createCompra(CompraDTO dto);
+    List<CompraConDetallesDTO> getComprasByUsuarioId(Integer usuarioId);
     CompraConDetallesDTO getCompraById(Integer id);
     List<CompraConDetallesDTO> getComprasPorUsuario(Integer usuarioId);
     List<CompraConDetallesDTO> getComprasPorRangoFechas(LocalDate inicio, LocalDate fin);
