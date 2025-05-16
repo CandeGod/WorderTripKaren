@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="sitios.css">
 </head>
+
 <body>
     <div class="sitios-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Admin Profile" class="admin-avatar" id="admin-avatar">
+                <h3 id="admin-name">Cargando...</h3>
+                <p id="admin-email"></p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="../../index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+                    <li class="active"><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li><a href="../compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
+                    <li><a href="../usuarios/usuarios.html"><i class="fas fa-users"></i> Usuarios</a>
+                    </li>
+                    <li><a href="../reportes/reportes.html"><i class="fas fa-flag"></i> Reportes</a></li>
+                    <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+                    <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
         <header class="sitios-header">
             <h1>Gestión de Sitios Turísticos</h1>
             <button id="nuevo-sitio-btn" class="btn-primary">
@@ -41,17 +69,17 @@
             <h2 id="modal-title">Nuevo Sitio Turístico</h2>
             <form id="sitio-form">
                 <input type="hidden" id="sitio-id">
-                
+
                 <div class="form-group">
                     <label for="sitio-nombre">Nombre</label>
                     <input type="text" id="sitio-nombre" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="sitio-descripcion">Descripción</label>
                     <textarea id="sitio-descripcion" rows="3" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="sitio-ubicacion">Ubicación</label>
                     <input type="text" id="sitio-ubicacion" required>
@@ -68,7 +96,7 @@
                         <!-- Se llenará dinámicamente -->
                     </select>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" id="cancelar-sitio" class="btn-secondary">Cancelar</button>
                     <button type="submit" id="guardar-sitio" class="btn-primary">Guardar</button>
@@ -90,4 +118,5 @@
 
     <script src="sitios.js" type="module"></script>
 </body>
+
 </html>

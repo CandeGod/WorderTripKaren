@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="usuarios.css">
 </head>
+
 <body>
     <div class="usuarios-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Admin Profile" class="admin-avatar" id="admin-avatar">
+                <h3 id="admin-name">Cargando...</h3>
+                <p id="admin-email"></p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="../../index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+                    <li><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li><a href="../compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
+                    <li class="active"><a href="../usuarios/usuarios.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                    <li><a href="../reportes/reportes.html"><i class="fas fa-flag"></i> Reportes</a></li>
+                    <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+                    <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
         <header class="usuarios-header">
             <h1>Gestión de Usuarios</h1>
             <button id="nuevo-usuario-btn" class="btn-primary">
@@ -47,22 +75,22 @@
             <h2 id="modal-title">Nuevo Usuario</h2>
             <form id="usuario-form">
                 <input type="hidden" id="usuario-id">
-                
+
                 <div class="form-group">
                     <label for="usuario-nombre">Nombre</label>
                     <input type="text" id="usuario-nombre" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="usuario-email">Email</label>
                     <input type="email" id="usuario-email" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="usuario-password">Contraseña</label>
                     <input type="password" id="usuario-password" placeholder="Dejar vacío para no cambiar">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="usuario-sexo">Sexo</label>
                     <select id="usuario-sexo">
@@ -72,7 +100,7 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="usuario-rol">Rol</label>
                     <select id="usuario-rol" required>
@@ -80,12 +108,12 @@
                         <option value="ADMINISTRADOR">Administrador</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="usuario-imagen">URL de la imagen de perfil</label>
                     <input type="url" id="usuario-imagen" placeholder="https://example.com/image.jpg">
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" id="cancelar-usuario" class="btn-secondary">Cancelar</button>
                     <button type="submit" id="guardar-usuario" class="btn-primary">Guardar</button>
@@ -97,10 +125,12 @@
     <!-- Modal para reportes de usuario -->
     <div class="modal" id="reportes-modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('reportes-modal').style.display='none'">&times;</span>
+            <span class="close-modal"
+                onclick="document.getElementById('reportes-modal').style.display='none'">&times;</span>
             <div id="reportes-content"></div>
             <div class="modal-actions">
-                <button class="btn-secondary" onclick="document.getElementById('reportes-modal').style.display='none'">Cerrar</button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('reportes-modal').style.display='none'">Cerrar</button>
             </div>
         </div>
     </div>
@@ -108,14 +138,17 @@
     <!-- Modal para compras de usuario -->
     <div class="modal" id="compras-modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('compras-modal').style.display='none'">&times;</span>
+            <span class="close-modal"
+                onclick="document.getElementById('compras-modal').style.display='none'">&times;</span>
             <div id="compras-content"></div>
             <div class="modal-actions">
-                <button class="btn-secondary" onclick="document.getElementById('compras-modal').style.display='none'">Cerrar</button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('compras-modal').style.display='none'">Cerrar</button>
             </div>
         </div>
     </div>
 
     <script src="usuarios.js" type="module"></script>
 </body>
+
 </html>
