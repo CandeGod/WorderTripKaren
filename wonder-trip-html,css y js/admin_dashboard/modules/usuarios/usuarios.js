@@ -185,33 +185,19 @@ class UsuariosApp {
         nextBtn.disabled = this.currentPage === this.totalPages - 1;
     }
 
-    async verReportesUsuario(userId, page = 0, size = 10) {
-        try {
-            const response = await fetch(`http://localhost:8080/api/reportes/usuario/${userId}?page=${page}&size=${size}&sort=asc`);
-            if (!response.ok) throw new Error('Error al cargar reportes');
-
-            const data = await response.json();
-            // Si la respuesta tiene paginación (por ejemplo, data.content)
-            const reportes = data.content || data;
-
-            const container = document.getElementById('reportes-content');
-            if (reportes.length === 0) {
-                container.innerHTML = `<p>No hay reportes para este usuario.</p>`;
-            } else {
-                container.innerHTML = reportes.map(r => `
-                <div class="reporte-item">
-                    <h4>${r.titulo}</h4>
-                    <p>${r.descripcion}</p>
-                    <small>Fecha: ${r.fecha}</small>
-                </div>
-            `).join('');
-            }
-            document.getElementById('reportes-modal').style.display = 'block';
-
-        } catch (error) {
-            alert('Error al cargar reportes: ' + error.message);
-        }
+    async verReportesUsuario(userId) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/reportes/usuario/${userId}?page=0&size=10&sort=asc`);
+        if (!response.ok) throw new Error('Error al cargar reportes');
+        
+        const reportes = await response.json();
+        // Asegurarnos de que reportes es un array
+        const reportesArray = Array.isArray(reportes) ? reportes : (reportes.content || []);
+        this.mostrarReportesModal(reportesArray, userId);
+    } catch (error) {
+        handleApiError(error);
     }
+}
 
 
     mostrarReportesModal(reportes, userId) {
@@ -322,62 +308,82 @@ class UsuariosApp {
     }
 
     async saveUsuario() {
-        const form = document.getElementById('usuario-form');
-        const id = document.getElementById('usuario-id').value;
-        const isNew = !id;
+    const form = document.getElementById('usuario-form');
+    const id = document.getElementById('usuario-id').value;
+    const isNew = !id;
+    
+    // Construir objeto exactamente como lo espera el backend
+    const usuarioData = {
+        nombre: document.getElementById('usuario-nombre').value,
+        sexo: document.getElementById('usuario-sexo').value,
+        correo: document.getElementById('usuario-email').value,
+        contrasena: document.getElementById('usuario-password').value,
+        rol: document.getElementById('usuario-rol').value,
+        imagenPerfil: document.getElementById('usuario-imagen').value || null
+    };
 
-        const usuarioData = {
-            nombre: document.getElementById('usuario-nombre').value,
-            correo: document.getElementById('usuario-email').value,
-            sexo: document.getElementById('usuario-sexo').value,
-            rol: document.getElementById('usuario-rol').value,
-            imagenPerfil: document.getElementById('usuario-imagen').value || null,
-            contrasena: document.getElementById('usuario-password').value || undefined
+    try {
+        // Verificar que tenemos token de autenticación
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData || !userData.token) {
+            throw new Error('No se encontró token de autenticación');
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userData.token}`
         };
 
-        try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userData.token || ''}`
-            };
-
-            let response;
-
-            if (isNew) {
-                if (!usuarioData.contrasena) {
-                    throw new Error('La contraseña es requerida para nuevos usuarios');
-                }
-
-                response = await fetch('http://localhost:8080/api/usuarios', {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(usuarioData)
-                });
-            } else {
-                // Para actualización, no enviar contraseña si está vacía
-                if (!usuarioData.contrasena) {
-                    delete usuarioData.contrasena;
-                }
-
-                response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
-                    method: 'PUT',
-                    headers: headers,
-                    body: JSON.stringify(usuarioData)
-                });
+        let url, method;
+        
+        if (isNew) {
+            // Validar campos requeridos para nuevo usuario
+            if (!usuarioData.nombre || !usuarioData.correo || !usuarioData.contrasena) {
+                throw new Error('Nombre, correo y contraseña son requeridos');
             }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al guardar el usuario');
+            
+            url = 'http://localhost:8080/api/usuarios';
+            method = 'POST';
+        } else {
+            url = `http://localhost:8080/api/usuarios/${id}`;
+            method = 'PUT';
+            
+            // Para actualización, si la contraseña está vacía, no la enviamos
+            if (!usuarioData.contrasena) {
+                delete usuarioData.contrasena;
             }
-
-            this.closeModal('usuario-modal');
-            this.loadUsuarios();
-        } catch (error) {
-            handleApiError(error);
         }
+
+        console.log('Enviando datos:', { url, method, usuarioData }); // Para depuración
+
+        const response = await fetch(url, {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(usuarioData)
+        });
+
+        console.log('Respuesta recibida:', response); // Para depuración
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error detallado:', errorData); // Para depuración
+            throw new Error(errorData.message || `Error al ${isNew ? 'crear' : 'actualizar'} el usuario`);
+        }
+
+        const responseData = await response.json();
+        console.log('Datos recibidos:', responseData); // Para depuración
+
+        this.closeModal('usuario-modal');
+        this.loadUsuarios();
+        
+        // Mostrar mensaje de éxito con más información
+        alert(`Usuario ${isNew ? 'creado' : 'actualizado'} correctamente con ID: ${responseData.id}`);
+    } catch (error) {
+        console.error('Error completo:', error); // Para depuración
+        alert(`Error: ${error.message}\n\nVerifica la consola para más detalles`);
     }
+}
+
 
     closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
