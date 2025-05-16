@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Wondertrip</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <!-- Sidebar - Eliminé el aside duplicado -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="" alt="Admin Profile" class="admin-avatar" id="admin-avatar">
+        <h3 id="admin-name">Cargando...</h3>
+        <p id="admin-email"></p>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="modules/eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+            <li><a href="modules/paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+            <li><a href="modules/sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+            <li><a href="modules/compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
+            <li><a href="modules/usuarios/usuarios.html"><i class="fas fa-users"></i> Usuarios</a></li>
+            <li><a href="modules/reportes/reportes.html"><i class="fas fa-flag"></i> Reportes</a></li>
+            <li><a href="modules/tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+            <li><a href="modules/hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+    </div>
+</aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="main-header">
+        <h1>Panel de Administración</h1>
+        <div class="header-actions">
+          <div class="notifications">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="stats-container">
+          <!-- Estas estadísticas se llenarán dinámicamente -->
+          <div class="stat-card">
+            <div class="stat-icon users">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+              <h3 id="total-users">0</h3>
+              <p>Usuarios Registrados</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon events">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-info">
+              <h3 id="total-events">0</h3>
+              <p>Eventos Activos</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon sales">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+              <h3 id="total-sales">0</h3>
+              <p>Ventas Hoy</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon reports">
+              <i class="fas fa-flag"></i>
+            </div>
+            <div class="stat-info">
+              <h3 id="total-reports">0</h3>
+              <p>Reportes Pendientes</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="recent-activity">
+          <h2>Actividad Reciente</h2>
+          <div class="activity-list" id="activity-list">
+            <!-- Aquí se cargará la actividad reciente -->
+            <div class="loading">Cargando actividad reciente...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="admin.js" type="module"></script>
+</body>
+
+</html>

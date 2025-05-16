@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
             localStorage.setItem('userData', JSON.stringify(data));
             
             if (data.rol === "ADMINISTRADOR") {
-                window.location.href = "html/admin_dashboard.html";
+                window.location.href = "admin_dashboard/index.html";
             } else {
                 window.location.href = 'html/user_dashboard.html';
             }

@@ -14,8 +14,13 @@ export function toggleForms() {
     }
 }
 
-export function handleApiError(error, elementId) {
+export function handleApiError(error, elementId = 'error-message') {
     const errorElement = document.getElementById(elementId);
+    if (!errorElement) {
+        console.error('Error:', error.message || error);
+        return;
+    }
+    
     if (error.message) {
         errorElement.textContent = error.message;
     } else if (error.errors) {
