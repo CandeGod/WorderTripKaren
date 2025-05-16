@@ -46,7 +46,7 @@ public class SitioTuristicoService implements ISitioTuristicoService{
         site.setDescripcion(dto.getDescripcion());
         site.setUbicacion(dto.getUbicacion());
         site.setHotel(hotel);
-
+        site.setImagenPrincipal(dto.getImagenPrincipal());
         return toDTO(repository.save(site));
     }
 
@@ -62,6 +62,7 @@ public class SitioTuristicoService implements ISitioTuristicoService{
         site.setDescripcion(dto.getDescripcion());
         site.setUbicacion(dto.getUbicacion());
         site.setHotel(hotel);
+        site.setImagenPrincipal(dto.getImagenPrincipal());
 
         return toDTO(repository.save(site));
     }

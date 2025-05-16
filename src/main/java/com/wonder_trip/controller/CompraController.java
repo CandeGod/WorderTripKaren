@@ -1,5 +1,6 @@
 package com.wonder_trip.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -38,11 +39,11 @@ public class CompraController {
     }
 
     @Operation(summary = "Obtener compras de un usuario")
-@ApiResponse(responseCode = "200", description = "Lista de compras del usuario")
-@GetMapping("/{id}/compras")
-public ResponseEntity<List<CompraConDetallesDTO>> getComprasByUsuarioId(@PathVariable Integer id) {
-    return ResponseEntity.ok(service.getComprasByUsuarioId(id));
-}
+    @ApiResponse(responseCode = "200", description = "Lista de compras del usuario")
+    @GetMapping("/{id}/compras")
+    public ResponseEntity<List<CompraConDetallesDTO>> getComprasByUsuarioId(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getComprasByUsuarioId(id));
+    }
 
     @Operation(summary = "Obtener una compra por ID")
     @GetMapping("/{id}")
@@ -59,7 +60,7 @@ public ResponseEntity<List<CompraConDetallesDTO>> getComprasByUsuarioId(@PathVar
     @Operation(summary = "Listar compras por rango de fechas")
     @GetMapping("/fechas")
     public ResponseEntity<List<CompraConDetallesDTO>> getByFechas(@RequestParam LocalDate inicio,
-                                                                   @RequestParam LocalDate fin) {
+            @RequestParam LocalDate fin) {
         return ResponseEntity.ok(service.getComprasPorRangoFechas(inicio, fin));
     }
 
@@ -68,5 +69,11 @@ public ResponseEntity<List<CompraConDetallesDTO>> getComprasByUsuarioId(@PathVar
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         service.deleteCompra(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Obtener la suma total de todas las compras")
+    @GetMapping("/suma-total")
+    public ResponseEntity<BigDecimal> getSumaTotalCompras() {
+        return ResponseEntity.ok(service.getSumaTotalCompras());
     }
 }

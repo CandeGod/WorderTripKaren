@@ -1,5 +1,6 @@
 package com.wonder_trip.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,5 +99,11 @@ public class CompraServiceImpl implements ICompraService {
         dto.setUsuario(modelMapper.map(compra.getUsuario(), UsuarioDTO.class));
         dto.setPaquete(modelMapper.map(compra.getPaquete(), PaqueteDTO.class));
         return dto;
+    }
+
+    @Override
+    public BigDecimal getSumaTotalCompras() {
+        return compraRepository.obtenerSumaTotalCompras() != null ? compraRepository.obtenerSumaTotalCompras()
+                : BigDecimal.ZERO;
     }
 }
