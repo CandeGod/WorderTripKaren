@@ -81,26 +81,33 @@ class PaquetesApp {
     }
 
     async loadPaquetes() {
-        const paquetesList = document.getElementById('paquetes-list');
-        paquetesList.innerHTML = '<div class="loading">Cargando paquetes...</div>';
-        
-        try {
-            let url = 'http://localhost:8080/api/paquetes';
-            
-            if (this.searchQuery) {
-                url += `?search=${encodeURIComponent(this.searchQuery)}`;
-            }
+    const paquetesList = document.getElementById('paquetes-list');
+    paquetesList.innerHTML = '<div class="loading">Cargando paquetes...</div>';
 
-            const response = await fetch(url);
+    try {
+        let paquetes = [];
+
+        if (this.searchQuery && !isNaN(this.searchQuery)) {
+            // Buscar por ID
+            const response = await fetch(`http://localhost:8080/api/paquetes/${this.searchQuery}`);
+            if (response.ok) {
+                const paquete = await response.json();
+                paquetes = [paquete]; // Mostrar en arreglo
+            }
+        } else {
+            // Cargar todos los paquetes
+            const response = await fetch('http://localhost:8080/api/paquetes');
             if (!response.ok) throw new Error('Error al cargar paquetes');
-            
-            const paquetes = await response.json();
-            this.displayPaquetes(paquetes);
-        } catch (error) {
-            handleApiError(error);
-            paquetesList.innerHTML = `<div class="error">Error al cargar paquetes: ${error.message}</div>`;
+            paquetes = await response.json();
         }
+
+        this.displayPaquetes(paquetes);
+    } catch (error) {
+        handleApiError(error);
+        paquetesList.innerHTML = `<div class="error">Error al cargar paquetes: ${error.message}</div>`;
     }
+}
+
 
     displayPaquetes(paquetes) {
         const paquetesList = document.getElementById('paquetes-list');
@@ -209,52 +216,66 @@ class PaquetesApp {
         document.getElementById(modalId).style.display = 'none';
     }
 
-    async savePaquete() {
-        const form = document.getElementById('paquete-form');
-        const id = document.getElementById('paquete-id').value;
-        const isNew = !id;
-        
-        const paqueteData = {
-            nombre: document.getElementById('paquete-nombre').value,
-            descripcion: document.getElementById('paquete-descripcion').value,
-            precio: parseFloat(document.getElementById('paquete-precio').value),
-            sitiosIncluidos: Array.from(this.selectedSitios)
+   async savePaquete() {
+    const form = document.getElementById('paquete-form');
+    const id = document.getElementById('paquete-id').value;
+    const isNew = !id;
+
+    const paqueteData = {
+        nombre: document.getElementById('paquete-nombre').value,
+        descripcion: document.getElementById('paquete-descripcion').value,
+        precio: parseFloat(document.getElementById('paquete-precio').value)
+    };
+
+    try {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userData.token || ''}`
         };
 
-        try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userData.token || ''}`
-            };
+        let response;
 
-            let response;
-            
-            if (isNew) {
-                response = await fetch('http://localhost:8080/api/paquetes', {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(paqueteData)
-                });
-            } else {
-                response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {
-                    method: 'PUT',
-                    headers: headers,
-                    body: JSON.stringify(paqueteData)
-                });
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al guardar el paquete');
-            }
-
-            this.closeModal('paquete-modal');
-            this.loadPaquetes();
-        } catch (error) {
-            handleApiError(error);
+        if (isNew) {
+            response = await fetch('http://localhost:8080/api/paquetes', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(paqueteData)
+            });
+        } else {
+            response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify(paqueteData)
+            });
         }
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al guardar el paquete');
+        }
+
+        const savedPaquete = await response.json(); // ⬅️ Obtener el ID del paquete creado
+
+        // Asociar sitios al paquete
+        for (const sitioId of this.selectedSitios) {
+            await fetch('http://localhost:8080/api/paquetes/agregar-sitio', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    paqueteId: savedPaquete.id,
+                    sitioId: sitioId
+                })
+            });
+        }
+
+        this.closeModal('paquete-modal');
+        this.loadPaquetes();
+    } catch (error) {
+        handleApiError(error);
     }
+}
+
 
     async editPaquete(id) {
         try {
