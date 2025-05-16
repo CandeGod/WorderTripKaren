@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitios Turísticos - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="sitios.css">
+</head>
+<body>
+    <div class="sitios-container">
+        <header class="sitios-header">
+            <h1>Gestión de Sitios Turísticos</h1>
+            <button id="nuevo-sitio-btn" class="btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Sitio
+            </button>
+        </header>
+
+        <div class="sitios-filtros">
+            <div class="search-box">
+                <input type="text" id="buscar-sitio" placeholder="Buscar sitios...">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+
+        <div class="sitios-list" id="sitios-list">
+            <!-- Aquí se cargarán los sitios dinámicamente -->
+            <div class="loading">Cargando sitios turísticos...</div>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Paginación se cargará dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar sitios -->
+    <div class="modal" id="sitio-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Nuevo Sitio Turístico</h2>
+            <form id="sitio-form">
+                <input type="hidden" id="sitio-id">
+                
+                <div class="form-group">
+                    <label for="sitio-nombre">Nombre</label>
+                    <input type="text" id="sitio-nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sitio-descripcion">Descripción</label>
+                    <textarea id="sitio-descripcion" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sitio-ubicacion">Ubicación</label>
+                    <input type="text" id="sitio-ubicacion" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sitio-imagen">URL de la imagen principal</label>
+                    <input type="url" id="sitio-imagen" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="sitio-hotel">Hotel asociado</label>
+                    <select id="sitio-hotel">
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelar-sitio" class="btn-secondary">Cancelar</button>
+                    <button type="submit" id="guardar-sitio" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content small">
+            <h3 id="confirm-message">¿Estás seguro que deseas eliminar este sitio turístico?</h3>
+            <div class="confirm-actions">
+                <button id="confirm-cancel" class="btn-secondary">Cancelar</button>
+                <button id="confirm-ok" class="btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="sitios.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="usuarios.css">
+</head>
+<body>
+    <div class="usuarios-container">
+        <header class="usuarios-header">
+            <h1>Gestión de Usuarios</h1>
+            <button id="nuevo-usuario-btn" class="btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Usuario
+            </button>
+        </header>
+
+        <div class="usuarios-filtros">
+            <div class="search-box">
+                <input type="text" id="buscar-usuario" placeholder="Buscar usuarios por ID...">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+
+        <div class="usuarios-list" id="usuarios-list">
+            <!-- Aquí se cargarán los usuarios dinámicamente -->
+            <div class="loading">Cargando usuarios...</div>
+        </div>
+
+        <div class="pagination-controls">
+            <button id="prev-page" class="btn-secondary" disabled>
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            <span id="pagination-info">Página 1 de 1</span>
+            <button id="next-page" class="btn-secondary" disabled>
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar usuarios -->
+    <div class="modal" id="usuario-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Nuevo Usuario</h2>
+            <form id="usuario-form">
+                <input type="hidden" id="usuario-id">
+                
+                <div class="form-group">
+                    <label for="usuario-nombre">Nombre</label>
+                    <input type="text" id="usuario-nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario-email">Email</label>
+                    <input type="email" id="usuario-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario-password">Contraseña</label>
+                    <input type="password" id="usuario-password" placeholder="Dejar vacío para no cambiar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario-sexo">Sexo</label>
+                    <select id="usuario-sexo">
+                        <option value="">Seleccionar</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario-rol">Rol</label>
+                    <select id="usuario-rol" required>
+                        <option value="USUARIO">Usuario</option>
+                        <option value="ADMINISTRADOR">Administrador</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usuario-imagen">URL de la imagen de perfil</label>
+                    <input type="url" id="usuario-imagen" placeholder="https://example.com/image.jpg">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelar-usuario" class="btn-secondary">Cancelar</button>
+                    <button type="submit" id="guardar-usuario" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para reportes de usuario -->
+    <div class="modal" id="reportes-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('reportes-modal').style.display='none'">&times;</span>
+            <div id="reportes-content"></div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="document.getElementById('reportes-modal').style.display='none'">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para compras de usuario -->
+    <div class="modal" id="compras-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('compras-modal').style.display='none'">&times;</span>
+            <div id="compras-content"></div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="document.getElementById('compras-modal').style.display='none'">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="usuarios.js" type="module"></script>
+</body>
+</html>
