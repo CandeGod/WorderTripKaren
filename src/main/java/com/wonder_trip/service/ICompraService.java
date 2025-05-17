@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.wonder_trip.dto.CompraConDetallesDTO;
 import com.wonder_trip.dto.CompraDTO;
 
@@ -16,4 +19,6 @@ public interface ICompraService {
     void deleteCompra(Integer id);
 
     BigDecimal getSumaTotalCompras();
+    Page<CompraConDetallesDTO> getAllComprasPaginado(Pageable pageable);
+
 }

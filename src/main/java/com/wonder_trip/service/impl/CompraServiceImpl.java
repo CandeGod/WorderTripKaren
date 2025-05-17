@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.wonder_trip.dto.CompraConDetallesDTO;
@@ -106,4 +108,11 @@ public class CompraServiceImpl implements ICompraService {
         return compraRepository.obtenerSumaTotalCompras() != null ? compraRepository.obtenerSumaTotalCompras()
                 : BigDecimal.ZERO;
     }
+
+    @Override
+    public Page<CompraConDetallesDTO> getAllComprasPaginado(Pageable pageable) {
+        Page<Compra> compras = compraRepository.findAll(pageable);
+        return compras.map(this::convertirADetallesDTO);
+    }
+
 }
