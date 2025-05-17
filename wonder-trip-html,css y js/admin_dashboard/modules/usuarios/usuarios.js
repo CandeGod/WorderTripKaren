@@ -1,391 +1,451 @@
-import { handleApiError } from '../../../js/shared/utils.js';
-
-document.addEventListener('DOMContentLoaded', function () {
-    const usuariosApp = new UsuariosApp();
-    usuariosApp.init();
-});
+const API_BASE_URL = 'http://localhost:8080/api';
 
 class UsuariosApp {
     constructor() {
         this.currentPage = 0;
         this.pageSize = 10;
-        this.searchQuery = '';
-        this.totalPages = 1;
+        this.sortDirection = 'asc';
+        this.totalUsuarios = 0;
+        this.usuariosData = [];
     }
 
-    init() {
+    async init() {
+        await this.loadUsuarios();
         this.setupEventListeners();
-        this.loadUsuarios();
     }
 
-    setupEventListeners() {
-        // Botón nuevo usuario
-        document.getElementById('nuevo-usuario-btn').addEventListener('click', () => {
-            this.openUsuarioModal();
-        });
-
-        // Búsqueda
-        document.getElementById('buscar-usuario').addEventListener('input', (e) => {
-            this.searchQuery = e.target.value;
-            this.debouncedSearch();
-        });
-
-        // Botones modales
-        document.getElementById('cancelar-usuario').addEventListener('click', () => {
-            this.closeModal('usuario-modal');
-        });
-
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            this.closeModal('usuario-modal');
-        });
-
-        // Event delegation para botones dinámicos
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-reportes')) {
-                const userId = e.target.closest('.btn-reportes').getAttribute('data-id');
-                this.verReportesUsuario(userId);
-            }
-
-            if (e.target.closest('.btn-compras')) {
-                const userId = e.target.closest('.btn-compras').getAttribute('data-id');
-                this.verComprasUsuario(userId);
-            }
-
-            if (e.target.closest('.btn-edit')) {
-                const userId = e.target.closest('.btn-edit').getAttribute('data-id');
-                this.editUsuario(userId);
-            }
-        });
-
-        // Paginación
-        document.getElementById('prev-page').addEventListener('click', () => {
-            if (this.currentPage > 0) {
-                this.currentPage--;
-                this.loadUsuarios();
-            }
-        });
-
-        document.getElementById('next-page').addEventListener('click', () => {
-            if (this.currentPage < this.totalPages - 1) {
-                this.currentPage++;
-                this.loadUsuarios();
-            }
-        });
-    }
-
-    debouncedSearch = this.debounce(() => {
-        this.currentPage = 0; // Resetear a primera página al buscar
-        this.loadUsuarios();
-    }, 300);
-
-    debounce(func, wait) {
-        let timeout;
-        return function () {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(context, args);
-            }, wait);
-        };
-    }
-
-    async loadUsuarios() {
-        const usuariosList = document.getElementById('usuarios-list');
-        usuariosList.innerHTML = '<div class="loading">Cargando usuarios...</div>';
-
+    async loadUsuarios(page = this.currentPage, size = this.pageSize, sort = this.sortDirection, filtros = {}) {
         try {
-            let url = `http://localhost:8080/api/usuarios?page=${this.currentPage}&size=${this.pageSize}&sort=asc`;
+            let url = `${API_BASE_URL}/usuarios?page=${page}&size=${size}&sort=${sort}`;
 
-            if (this.searchQuery) {
-                if (!isNaN(this.searchQuery)) {
-                    // Si es un número, buscar por ID
-                    const response = await fetch(`http://localhost:8080/api/usuarios/${this.searchQuery}`);
-                    if (!response.ok) throw new Error('Usuario no encontrado');
-
-                    const usuario = await response.json();
-                    this.displayUsuarios([usuario]);
-                    this.totalPages = 1;
-                    this.updatePagination();
-                    return;
-                } else {
-                    // Búsqueda por texto
-                    url += `&search=${encodeURIComponent(this.searchQuery)}`;
-                }
+            if (filtros.busqueda) {
+                url += `&nombre=${encodeURIComponent(filtros.busqueda)}`;
+            }
+            if (filtros.rol) {
+                url += `&rol=${filtros.rol}`;
             }
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Error al cargar usuarios');
 
             const data = await response.json();
-            const usuarios = Array.isArray(data) ? data : data.content || [];
-            this.totalPages = Array.isArray(data) ? 1 : data.totalPages || 1;
+            this.usuariosData = Array.isArray(data) ? data : data.content || [];
+            this.totalUsuarios = data.totalElements || data.length;
 
-            this.displayUsuarios(usuarios);
+            this.renderUsuariosTable();
             this.updatePagination();
+            this.updateStats();
         } catch (error) {
-            handleApiError(error);
-            usuariosList.innerHTML = `<div class="error">Error al cargar usuarios: ${error.message}</div>`;
+            console.error('Error:', error);
+            this.showAlert('Error al cargar usuarios', 'danger');
         }
     }
 
-    displayUsuarios(usuarios) {
-        const usuariosList = document.getElementById('usuarios-list');
+    renderUsuariosTable() {
+        const usuariosTableBody = document.getElementById('usuariosTableBody');
+        usuariosTableBody.innerHTML = '';
 
-        if (usuarios.length === 0) {
-            usuariosList.innerHTML = '<div class="loading">No se encontraron usuarios</div>';
+        if (this.usuariosData.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="7" class="text-center">No se encontraron usuarios</td>`;
+            usuariosTableBody.appendChild(row);
             return;
         }
 
-        usuariosList.innerHTML = '';
-
-        usuarios.forEach(usuario => {
-            const usuarioCard = document.createElement('div');
-            usuarioCard.className = 'usuario-card';
-            usuarioCard.innerHTML = `
-                <div class="usuario-header">
-                    <div class="usuario-imagen" style="background-image: url('${usuario.imagenPerfil || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'}')">
-                        ${!usuario.imagenPerfil ? '<i class="fas fa-user fa-2x"></i>' : ''}
-                    </div>
-                    <div class="usuario-info">
-                        <h3 class="usuario-nombre">${usuario.nombre}</h3>
-                        <p class="usuario-email">${usuario.correo}</p>
-                        <span class="usuario-rol ${usuario.rol.toLowerCase()}">${usuario.rol}</span>
-                    </div>
-                </div>
-                <div class="usuario-detalles">
-                    <p><i class="fas fa-venus-mars"></i> ${usuario.sexo || 'No especificado'}</p>
-                    <p><i class="fas fa-clipboard-list"></i> Reportes: ${usuario.reportes?.length || 0}</p>
-                </div>
-                <div class="usuario-actions">
-                    <button class="btn-icon btn-edit" data-id="${usuario.id}" title="Editar usuario">
-                        <i class="fas fa-edit"></i>
+        this.usuariosData.forEach(usuario => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <img src="${this.validateImageUrl(usuario.imagenPerfil)}" 
+                         alt="${usuario.nombre}" 
+                         class="img-thumbnail rounded-circle" 
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                </td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.correo}</td>
+                <td>${usuario.sexo}</td>
+                <td>
+                    <span class="badge ${usuario.rol === 'ADMINISTRADOR' ? 'bg-primary' : 'bg-secondary'}">
+                        ${usuario.rol === 'ADMINISTRADOR' ? 'ADMINISTRADOR' : 'USUARIO'}
+                    </span>
+                </td>
+                <td>
+                    ${usuario.reportes?.length || 0}
+                    ${usuario.reportes?.length > 0 ?
+                    `<button class="btn btn-sm btn-outline-info ms-2 ver-reportes" data-id="${usuario.id}">
+                            <i class="bi bi-eye"></i> Ver
+                        </button>` : ''
+                }
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1 editar-usuario" data-id="${usuario.id}">
+                        <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn-icon btn-reportes" data-id="${usuario.id}" title="Ver reportes">
-                        <i class="fas fa-exclamation-circle"></i>
+                    <button class="btn btn-sm btn-outline-danger eliminar-usuario" data-id="${usuario.id}" data-nombre="${usuario.nombre}">
+                        <i class="bi bi-trash"></i>
                     </button>
-                    <button class="btn-icon btn-compras" data-id="${usuario.id}" title="Ver compras">
-                        <i class="fas fa-shopping-bag"></i>
-                    </button>
-                </div>
+                </td>
             `;
-
-            usuariosList.appendChild(usuarioCard);
+            usuariosTableBody.appendChild(row);
         });
+    }
+
+    validateImageUrl(url) {
+        if (!url || !url.startsWith('http')) {
+            return 'https://via.placeholder.com/150?text=Usuario';
+        }
+        return url;
     }
 
     updatePagination() {
-        const paginationInfo = document.getElementById('pagination-info');
-        const prevBtn = document.getElementById('prev-page');
-        const nextBtn = document.getElementById('next-page');
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        const totalPages = Math.ceil(this.totalUsuarios / this.pageSize);
 
-        paginationInfo.textContent = `Página ${this.currentPage + 1} de ${this.totalPages}`;
+        if (totalPages <= 1) return;
 
-        prevBtn.disabled = this.currentPage === 0;
-        nextBtn.disabled = this.currentPage === this.totalPages - 1;
-    }
-
-    async verReportesUsuario(userId) {
-    try {
-        const response = await fetch(`http://localhost:8080/api/reportes/usuario/${userId}?page=0&size=10&sort=asc`);
-        if (!response.ok) throw new Error('Error al cargar reportes');
-        
-        const reportes = await response.json();
-        // Asegurarnos de que reportes es un array
-        const reportesArray = Array.isArray(reportes) ? reportes : (reportes.content || []);
-        this.mostrarReportesModal(reportesArray, userId);
-    } catch (error) {
-        handleApiError(error);
-    }
-}
-
-
-    mostrarReportesModal(reportes, userId) {
-        const modal = document.getElementById('reportes-modal');
-        const modalContent = document.getElementById('reportes-content');
-
-        let html = `<h3>Reportes del usuario ID: ${userId}</h3>`;
-
-        if (!reportes || reportes.length === 0) {
-            html += '<p>El usuario no tiene reportes.</p>';
-        } else {
-            html += '<div class="reportes-list">';
-            reportes.forEach(reporte => {
-                html += `
-                    <div class="reporte-item">
-                        <h4>${reporte.titulo}</h4>
-                        <p>${reporte.descripcion}</p>
-                        <small>Fecha: ${new Date(reporte.fecha).toLocaleDateString()}</small>
-                    </div>
-                `;
-            });
-            html += '</div>';
-        }
-
-        modalContent.innerHTML = html;
-        modal.style.display = 'flex';
-    }
-
-    async verComprasUsuario(userId) {
-        try {
-            const response = await fetch(`http://localhost:8080/api/compras/usuario/${userId}`);
-            if (!response.ok) throw new Error('Error al cargar compras');
-
-            const compras = await response.json();
-            this.mostrarComprasModal(compras, userId);
-        } catch (error) {
-            handleApiError(error);
-        }
-    }
-
-    mostrarComprasModal(compras, userId) {
-        const modal = document.getElementById('compras-modal');
-        const modalContent = document.getElementById('compras-content');
-
-        let html = `<h3>Compras del usuario ID: ${userId}</h3>`;
-
-        if (!compras || compras.length === 0) {
-            html += '<p>El usuario no tiene compras registradas.</p>';
-        } else {
-            // Calcular total gastado
-            const total = compras.reduce((sum, compra) => sum + (compra.paquete?.precio || 0), 0);
-
-            html += `
-                <div class="compras-summary">
-                    <p>Total gastado: <strong>$${total.toLocaleString()}</strong></p>
-                    <p>Número de compras: <strong>${compras.length}</strong></p>
-                </div>
-                <div class="compras-list">
-            `;
-
-            compras.forEach(compra => {
-                html += `
-                    <div class="compra-item">
-                        <h4>${compra.paquete?.nombre || 'Paquete no disponible'}</h4>
-                        <p>$${compra.paquete?.precio?.toLocaleString() || '0'}</p>
-                        <p>Método de pago: ${compra.metodoPago || 'No especificado'}</p>
-                        <small>Fecha: ${new Date(compra.fechaCompra).toLocaleDateString()}</small>
-                    </div>
-                `;
-            });
-            html += '</div>';
-        }
-
-        modalContent.innerHTML = html;
-        modal.style.display = 'flex';
-    }
-
-    openUsuarioModal(usuario = null) {
-        const modal = document.getElementById('usuario-modal');
-        const form = document.getElementById('usuario-form');
-
-        if (usuario) {
-            document.getElementById('modal-title').textContent = 'Editar Usuario';
-            document.getElementById('usuario-id').value = usuario.id;
-            document.getElementById('usuario-nombre').value = usuario.nombre;
-            document.getElementById('usuario-email').value = usuario.correo;
-            document.getElementById('usuario-sexo').value = usuario.sexo || '';
-            document.getElementById('usuario-rol').value = usuario.rol || 'USUARIO';
-            document.getElementById('usuario-imagen').value = usuario.imagenPerfil || '';
-        } else {
-            document.getElementById('modal-title').textContent = 'Nuevo Usuario';
-            form.reset();
-        }
-
-        modal.style.display = 'flex';
-    }
-
-    async editUsuario(id) {
-        try {
-            const response = await fetch(`http://localhost:8080/api/usuarios/${id}`);
-            if (!response.ok) throw new Error('Error al cargar el usuario');
-
-            const usuario = await response.json();
-            this.openUsuarioModal(usuario);
-        } catch (error) {
-            handleApiError(error);
-        }
-    }
-
-    async saveUsuario() {
-    const form = document.getElementById('usuario-form');
-    const id = document.getElementById('usuario-id').value;
-    const isNew = !id;
-    
-    // Construir objeto exactamente como lo espera el backend
-    const usuarioData = {
-        nombre: document.getElementById('usuario-nombre').value,
-        sexo: document.getElementById('usuario-sexo').value,
-        correo: document.getElementById('usuario-email').value,
-        contrasena: document.getElementById('usuario-password').value,
-        rol: document.getElementById('usuario-rol').value,
-        imagenPerfil: document.getElementById('usuario-imagen').value || null
-    };
-
-    try {
-        // Verificar que tenemos token de autenticación
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if (!userData || !userData.token) {
-            throw new Error('No se encontró token de autenticación');
-        }
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userData.token}`
-        };
-
-        let url, method;
-        
-        if (isNew) {
-            // Validar campos requeridos para nuevo usuario
-            if (!usuarioData.nombre || !usuarioData.correo || !usuarioData.contrasena) {
-                throw new Error('Nombre, correo y contraseña son requeridos');
+        // Botón Anterior
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${this.currentPage === 0 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+        prevLi.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (this.currentPage > 0) {
+                this.currentPage--;
+                this.loadUsuarios();
             }
-            
-            url = 'http://localhost:8080/api/usuarios';
-            method = 'POST';
-        } else {
-            url = `http://localhost:8080/api/usuarios/${id}`;
-            method = 'PUT';
-            
-            // Para actualización, si la contraseña está vacía, no la enviamos
-            if (!usuarioData.contrasena) {
-                delete usuarioData.contrasena;
-            }
+        });
+        pagination.appendChild(prevLi);
+
+        // Números de página
+        for (let i = 0; i < totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === this.currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+            li.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.currentPage = i;
+                this.loadUsuarios();
+            });
+            pagination.appendChild(li);
         }
 
-        console.log('Enviando datos:', { url, method, usuarioData }); // Para depuración
+        // Botón Siguiente
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${this.currentPage === totalPages - 1 ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+        nextLi.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (this.currentPage < totalPages - 1) {
+                this.currentPage++;
+                this.loadUsuarios();
+            }
+        });
+        pagination.appendChild(nextLi);
+    }
 
-        const response = await fetch(url, {
-            method: method,
-            headers: headers,
-            body: JSON.stringify(usuarioData)
+    updateStats() {
+        document.getElementById('totalUsuarios').textContent = this.totalUsuarios;
+
+        const totalAdmins = this.usuariosData.filter(u => u.rol === 'ADMINISTRADOR').length;
+        const totalUsers = this.usuariosData.filter(u => u.rol === 'USUARIO').length;
+
+        document.getElementById('totalAdmins').textContent = totalAdmins;
+        document.getElementById('totalUsers').textContent = totalUsers;
+    }
+
+    setupEventListeners() {
+        // Vista previa de imagen en editar usuario
+        document.getElementById('editImagenUsuario').addEventListener('input', (e) => {
+            const imagenUrl = e.target.value;
+            document.getElementById('editImagenPreview').src =
+                imagenUrl && imagenUrl.startsWith('http') ?
+                    imagenUrl :
+                    'https://via.placeholder.com/150?text=Usuario';
         });
 
-        console.log('Respuesta recibida:', response); // Para depuración
+        // Formulario nuevo usuario
+        document.getElementById('formNuevoUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Error detallado:', errorData); // Para depuración
-            throw new Error(errorData.message || `Error al ${isNew ? 'crear' : 'actualizar'} el usuario`);
+            const nuevoUsuario = {
+                nombre: document.getElementById('nombreUsuario').value,
+                correo: document.getElementById('correoUsuario').value,
+                contrasena: document.getElementById('contrasenaUsuario').value,
+                sexo: document.getElementById('sexoUsuario').value,
+                rol: document.getElementById('rolUsuario').value,
+                imagenPerfil: document.getElementById('imagenUsuario').value || null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/usuarios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(nuevoUsuario)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al crear usuario');
+                }
+
+                this.showAlert('Usuario creado exitosamente', 'success');
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoUsuarioModal'));
+                modal.hide();
+
+                document.getElementById('formNuevoUsuario').reset();
+                this.loadUsuarios();
+            } catch (error) {
+                console.error('Error:', error);
+                this.showAlert(error.message || 'Error al crear usuario', 'danger');
+            }
+        });
+
+        // Formulario editar usuario
+        document.getElementById('formEditarUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const usuarioId = document.getElementById('editIdUsuario').value;
+            const usuarioActualizado = {
+                nombre: document.getElementById('editNombreUsuario').value,
+                correo: document.getElementById('editCorreoUsuario').value,
+                sexo: document.getElementById('editSexoUsuario').value,
+                rol: document.getElementById('editRolUsuario').value,
+                imagenPerfil: document.getElementById('editImagenUsuario').value || null
+            };
+
+            // Solo agregar contraseña si se proporcionó una nueva
+            const nuevaContrasena = document.getElementById('editContrasenaUsuario').value;
+            if (nuevaContrasena) {
+                usuarioActualizado.contrasena = nuevaContrasena;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/usuarios/${usuarioId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(usuarioActualizado)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al actualizar usuario');
+                }
+
+                this.showAlert('Usuario actualizado exitosamente', 'success');
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editarUsuarioModal'));
+                modal.hide();
+
+                this.loadUsuarios();
+            } catch (error) {
+                console.error('Error:', error);
+                this.showAlert(error.message || 'Error al actualizar usuario', 'danger');
+            }
+        });
+
+        // Botones editar/eliminar/ver reportes (delegación de eventos)
+        document.getElementById('usuariosTableBody').addEventListener('click', (e) => {
+            if (e.target.closest('.editar-usuario')) {
+                const button = e.target.closest('.editar-usuario');
+                const usuarioId = button.getAttribute('data-id');
+                this.openEditModal(usuarioId);
+            }
+
+            if (e.target.closest('.eliminar-usuario')) {
+                const button = e.target.closest('.eliminar-usuario');
+                const usuarioId = button.getAttribute('data-id');
+                const usuarioNombre = button.getAttribute('data-nombre');
+                this.openDeleteConfirmationModal(usuarioId, usuarioNombre);
+            }
+
+            if (e.target.closest('.ver-reportes')) {
+                const button = e.target.closest('.ver-reportes');
+                const usuarioId = button.getAttribute('data-id');
+                this.openReportesModal(usuarioId);
+            }
+        });
+
+        // Confirmar eliminación
+        document.getElementById('confirmarEliminar').addEventListener('click', async () => {
+            const usuarioId = document.getElementById('confirmarEliminar').getAttribute('data-id');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/usuarios/${usuarioId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al eliminar usuario');
+                }
+
+                this.showAlert('Usuario eliminado exitosamente', 'success');
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminarModal'));
+                modal.hide();
+
+                this.loadUsuarios();
+            } catch (error) {
+                console.error('Error:', error);
+                this.showAlert(error.message || 'Error al eliminar usuario', 'danger');
+            }
+        });
+
+        // Filtros
+        document.getElementById('filtroUsuariosForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const filtros = {
+                busqueda: document.getElementById('busqueda').value.trim(),
+                rol: document.getElementById('rol').value
+            };
+
+            this.sortDirection = document.getElementById('orden').value;
+            this.currentPage = 0;
+            this.loadUsuarios(this.currentPage, this.pageSize, this.sortDirection, filtros);
+        });
+    }
+
+    async openEditModal(usuarioId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/usuarios/${usuarioId}`);
+            if (!response.ok) throw new Error('Error al cargar usuario');
+
+            const usuario = await response.json();
+
+            // Llenar formulario
+            document.getElementById('editIdUsuario').value = usuario.id;
+            document.getElementById('editNombreUsuario').value = usuario.nombre;
+            document.getElementById('editCorreoUsuario').value = usuario.correo;
+            document.getElementById('editSexoUsuario').value = usuario.sexo;
+            document.getElementById('editRolUsuario').value = usuario.rol;
+            document.getElementById('editImagenUsuario').value = usuario.imagenPerfil || '';
+
+            // Actualizar vista previa
+            document.getElementById('editImagenPreview').src =
+                this.validateImageUrl(usuario.imagenPerfil);
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('editarUsuarioModal'));
+            modal.show();
+        } catch (error) {
+            console.error('Error:', error);
+            this.showAlert('Error al cargar datos del usuario', 'danger');
+        }
+    }
+
+    async openReportesModal(usuarioId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/reportes/usuario/${usuarioId}`);
+        if (!response.ok) throw new Error('Error al cargar reportes');
+        
+        const data = await response.json();
+        
+        // Verificar la estructura de la respuesta
+        console.log('Respuesta de reportes:', data);
+        
+        this.renderReportesModal(data);
+        
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('reportesUsuarioModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error:', error);
+        this.showAlert('Error al cargar reportes del usuario', 'danger');
+    }
+}
+
+    renderReportesModal(reportes) {
+        const reportesContent = document.getElementById('reportesUsuarioContent');
+        reportesContent.innerHTML = '';
+
+        // Verificar si reportes es un array, si no, intentar extraer los reportes de la respuesta
+        let reportesArray = Array.isArray(reportes) ? reportes : [];
+
+        // Si no es array pero es un objeto con propiedad 'content' (paginación)
+        if (!Array.isArray(reportes) && reportes.content) {
+            reportesArray = reportes.content;
+        }
+        // Si no es array pero es un objeto con propiedad 'reportes'
+        else if (!Array.isArray(reportes) && reportes.reportes) {
+            reportesArray = reportes.reportes;
         }
 
-        const responseData = await response.json();
-        console.log('Datos recibidos:', responseData); // Para depuración
+        if (reportesArray.length === 0) {
+            reportesContent.innerHTML = '<p class="text-center">Este usuario no tiene reportes</p>';
+            return;
+        }
 
-        this.closeModal('usuario-modal');
-        this.loadUsuarios();
-        
-        // Mostrar mensaje de éxito con más información
-        alert(`Usuario ${isNew ? 'creado' : 'actualizado'} correctamente con ID: ${responseData.id}`);
-    } catch (error) {
-        console.error('Error completo:', error); // Para depuración
-        alert(`Error: ${error.message}\n\nVerifica la consola para más detalles`);
+        const reportesList = document.createElement('div');
+        reportesList.className = 'list-group';
+
+        reportesArray.forEach(reporte => {
+            // Verificar si el reporte tiene fecha, si no, usar fecha actual
+            const fechaReporte = reporte.fecha || new Date().toISOString();
+            const fecha = new Date(fechaReporte).toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const reporteItem = document.createElement('div');
+            reporteItem.className = 'list-group-item';
+            reporteItem.innerHTML = `
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">${reporte.titulo || 'Reporte sin título'}</h5>
+                <small>${fecha}</small>
+            </div>
+            <p class="mb-1">${reporte.descripcion || 'No hay descripción disponible'}</p>
+        `;
+            reportesList.appendChild(reporteItem);
+        });
+
+        reportesContent.appendChild(reportesList);
+    }
+
+    openDeleteConfirmationModal(usuarioId, usuarioNombre) {
+        document.getElementById('nombreUsuarioEliminar').textContent = usuarioNombre;
+        document.getElementById('confirmarEliminar').setAttribute('data-id', usuarioId);
+        const modal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
+        modal.show();
+    }
+
+    showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show fixed-top mx-auto mt-3`;
+        alertDiv.style.maxWidth = '500px';
+        alertDiv.style.zIndex = '1060';
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 150);
+        }, 3000);
     }
 }
 
-
-    closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-}
+// Inicializar la aplicación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    const usuariosApp = new UsuariosApp();
+    usuariosApp.init();
+});

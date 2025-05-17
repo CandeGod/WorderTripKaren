@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuarios - Admin Dashboard</title>
+    <title>Administración de Usuarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="usuarios.css">
 </head>
-
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -68,114 +64,239 @@
                 </div>
             </nav>
 
-            <!-- Main Content - Manteniendo EXACTAMENTE las mismas clases y estructura original -->
+            <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="usuarios-container">
-                    <header class="usuarios-header">
-                        <h1>Gestión de Usuarios</h1>
-                        <button id="nuevo-usuario-btn" class="btn-primary">
-                            <i class="fas fa-plus"></i> Nuevo Usuario
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Administración de Usuarios</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoUsuarioModal">
+                            <i class="bi bi-plus-circle"></i> Nuevo Usuario
                         </button>
-                    </header>
+                    </div>
+                </div>
 
-                    <div class="usuarios-filtros">
-                        <div class="search-box">
-                            <input type="text" id="buscar-usuario" placeholder="Buscar usuarios por ID...">
-                            <i class="fas fa-search"></i>
+                
+
+                <!-- Estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Total Usuarios</h5>
+                                <p class="card-text display-4" id="totalUsuarios">0</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="usuarios-list" id="usuarios-list">
-                        <!-- Aquí se cargarán los usuarios dinámicamente -->
-                        <div class="loading">Cargando usuarios...</div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Administradores</h5>
+                                <p class="card-text display-4" id="totalAdmins">0</p>
+                            </div>
+                        </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-warning h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Usuarios Normales</h5>
+                                <p class="card-text display-4" id="totalUsers">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="pagination-controls">
-                        <button id="prev-page" class="btn-secondary" disabled>
-                            <i class="fas fa-chevron-left"></i> Anterior
-                        </button>
-                        <span id="pagination-info">Página 1 de 1</span>
-                        <button id="next-page" class="btn-secondary" disabled>
-                            Siguiente <i class="fas fa-chevron-right"></i>
-                        </button>
+                <!-- Listado de Usuarios -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Foto</th>
+                                        <th>Nombre</th>
+                                        <th>Correo</th>
+                                        <th>Sexo</th>
+                                        <th>Rol</th>
+                                        <th>Reportes</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuariosTableBody">
+                                    <!-- Datos se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center" id="pagination">
+                                <!-- Paginación se cargará aquí -->
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Modal para crear/editar usuarios - Manteniendo EXACTAMENTE las mismas clases -->
-    <div class="modal" id="usuario-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2 id="modal-title">Nuevo Usuario</h2>
-            <form id="usuario-form">
-                <input type="hidden" id="usuario-id">
-
-                <div class="form-group">
-                    <label for="usuario-nombre">Nombre</label>
-                    <input type="text" id="usuario-nombre" required>
+    <!-- Modal Nuevo Usuario -->
+    <div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoUsuarioModalLabel">Agregar Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="form-group">
-                    <label for="usuario-email">Email</label>
-                    <input type="email" id="usuario-email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="usuario-password">Contraseña</label>
-                    <input type="password" id="usuario-password" placeholder="Dejar vacío para no cambiar">
-                </div>
-
-                <div class="form-group">
-                    <label for="usuario-sexo">Sexo</label>
-                    <select id="usuario-sexo">
-                        <option value="">Seleccionar</option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="usuario-rol">Rol</label>
-                    <select id="usuario-rol" required>
-                        <option value="USUARIO">Usuario</option>
-                        <option value="ADMINISTRADOR">Administrador</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="usuario-imagen">URL de la imagen de perfil</label>
-                    <input type="url" id="usuario-imagen" placeholder="https://example.com/image.jpg">
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" id="cancelar-usuario" class="btn-secondary">Cancelar</button>
-                    <button type="submit" id="guardar-usuario" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal para reportes de usuario - Manteniendo EXACTAMENTE las mismas clases -->
-    <div class="modal" id="reportes-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('reportes-modal').style.display='none'">&times;</span>
-            <div id="reportes-content"></div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="document.getElementById('reportes-modal').style.display='none'">Cerrar</button>
+                <form id="formNuevoUsuario">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombreUsuario" class="form-label">Nombre Completo</label>
+                                    <input type="text" class="form-control" id="nombreUsuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="correoUsuario" class="form-label">Correo Electrónico</label>
+                                    <input type="email" class="form-control" id="correoUsuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contrasenaUsuario" class="form-label">Contraseña</label>
+                                    <input type="password" class="form-control" id="contrasenaUsuario" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="sexoUsuario" class="form-label">Sexo</label>
+                                    <select class="form-select" id="sexoUsuario" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="rolUsuario" class="form-label">Rol</label>
+                                    <select class="form-select" id="rolUsuario" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="ADMINISTRADOR">Administrador</option>
+                                        <option value="USUARIO">Usuario</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="imagenUsuario" class="form-label">URL de la Imagen de Perfil</label>
+                                    <input type="url" class="form-control" id="imagenUsuario">
+                                    <small class="text-muted">Ej: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal para compras de usuario - Manteniendo EXACTAMENTE las mismas clases -->
-    <div class="modal" id="compras-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('compras-modal').style.display='none'">&times;</span>
-            <div id="compras-content"></div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="document.getElementById('compras-modal').style.display='none'">Cerrar</button>
+    <!-- Modal Editar Usuario -->
+    <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditarUsuario">
+                    <input type="hidden" id="editIdUsuario">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editNombreUsuario" class="form-label">Nombre Completo</label>
+                                    <input type="text" class="form-control" id="editNombreUsuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editCorreoUsuario" class="form-label">Correo Electrónico</label>
+                                    <input type="email" class="form-control" id="editCorreoUsuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editContrasenaUsuario" class="form-label">Nueva Contraseña</label>
+                                    <input type="password" class="form-control" id="editContrasenaUsuario" placeholder="Dejar vacío para no cambiar">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editSexoUsuario" class="form-label">Sexo</label>
+                                    <select class="form-select" id="editSexoUsuario" required>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editRolUsuario" class="form-label">Rol</label>
+                                    <select class="form-select" id="editRolUsuario" required>
+                                        <option value="ADMINISTRADOR">Administrador</option>
+                                        <option value="USUARIO">Usuario</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editImagenUsuario" class="form-label">URL de la Imagen de Perfil</label>
+                                    <input type="url" class="form-control" id="editImagenUsuario">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vista previa de imagen</label>
+                            <div class="border p-2 text-center">
+                                <img id="editImagenPreview" src="https://via.placeholder.com/150?text=Preview" alt="Preview" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</p>
+                    <p class="fw-bold" id="nombreUsuarioEliminar"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Reportes -->
+    <div class="modal fade" id="reportesUsuarioModal" tabindex="-1" aria-labelledby="reportesUsuarioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportesUsuarioModalLabel">Reportes del Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="reportesUsuarioContent">
+                        <!-- Contenido de reportes se cargará aquí -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>

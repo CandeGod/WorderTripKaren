@@ -1,14 +1,7 @@
-:root {
-    --primary-color: #2d3436;
-    --secondary-color: #0984e3;
-    --accent-color: #00cec9;
-    --light-color: #f5f6fa;
-    --dark-color: #2f3640;
-    --success-color: #00b894;
-    --warning-color: #fdcb6e;
-    --danger-color: #d63031;
-    --admin-color: #6c5ce7;
-    --user-color: #00b894;
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .sidebar {
@@ -19,7 +12,6 @@
     z-index: 100;
     padding: 48px 0 0;
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    background-color: #0095ff;
 }
 
 .sidebar .nav-link {
@@ -48,393 +40,140 @@
     color: #0d6efd;
 }
 
-
-.usuarios-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+main {
+    padding-top: 1.5rem;
 }
 
-.usuarios-header {
-    margin-bottom: 30px;
-}
-
-.usuarios-header h1 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-}
-
-.usuarios-filtros {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 20px;
-}
-
-.search-box {
-    position: relative;
-    flex-grow: 1;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 10px 15px 10px 40px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.search-box i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #777;
-}
-
-.usuarios-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.usuario-card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-}
-
-.usuario-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.usuario-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.usuario-imagen {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    background-color: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    margin-right: 15px;
-}
-
-.usuario-imagen i {
-    opacity: 0.5;
-}
-
-.usuario-info {
-    flex-grow: 1;
-}
-
-.usuario-nombre {
-    font-size: 1.1rem;
-    margin: 0 0 5px 0;
-    color: var(--primary-color);
-}
-
-.usuario-email {
-    font-size: 0.8rem;
-    color: #666;
-    margin: 0;
-}
-
-.usuario-rol {
-    display: inline-block;
-    padding: 2px 8px;
+/* Estilos para las tarjetas de estadísticas */
+.card {
+    border: none;
     border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-top: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
 }
 
-.usuario-rol.admin {
-    background-color: var(--admin-color);
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Estilos para la tabla */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Estilos para los badges de rol */
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+}
+
+/* Estilos para los botones de acción */
+.btn-outline-primary, .btn-outline-danger, .btn-outline-info {
+    border-width: 2px;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
     color: white;
 }
 
-.usuario-rol.usuario {
-    background-color: var(--user-color);
+.btn-outline-danger:hover {
+    background-color: #dc3545;
     color: white;
 }
 
-.usuario-detalles {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 15px;
+.btn-outline-info:hover {
+    background-color: #0dcaf0;
+    color: white;
 }
 
-.usuario-detalles p {
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.usuario-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-}
-
-.btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 5px;
-    color: #666;
-    transition: color 0.3s;
-}
-
-.btn-icon:hover {
-    color: var(--secondary-color);
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
+/* Estilos para los modales */
 .modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #777;
-}
-
-.close-modal:hover {
-    color: var(--danger-color);
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-.btn-secondary {
-    background-color: #ddd;
-    color: #333;
     border: none;
-    padding: 8px 16px;
+    border-radius: 10px;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+/* Estilos para la paginación */
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.pagination .page-link {
+    color: #0d6efd;
+}
+
+/* Estilos para las imágenes de perfil */
+.img-thumbnail {
+    padding: 0;
+    border: none;
+}
+
+/* Estilos para los formularios */
+.form-control, .form-select {
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
 }
 
-.btn-secondary:hover {
-    background-color: #ccc;
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-/* Estilos específicos para reportes y compras */
-.reportes-list {
-    margin-top: 20px;
-}
-
-.reporte-item {
-    background: #f9f9f9;
-    padding: 15px;
+/* Estilos para la lista de reportes */
+.list-group-item {
+    margin-bottom: 0.5rem;
     border-radius: 5px;
-    margin-bottom: 10px;
 }
 
-.reporte-item h4 {
-    margin: 0 0 5px 0;
-    color: var(--primary-color);
-}
-
-.reporte-item p {
-    margin: 5px 0;
-    color: #666;
-}
-
-.reporte-item small {
-    color: #999;
-    font-size: 0.8rem;
-}
-
-.compras-summary {
-    background: #f0f8ff;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-
-.compras-summary p {
-    margin: 5px 0;
-}
-
-.compras-list {
-    margin-top: 20px;
-}
-
-.compra-item {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    border-left: 4px solid var(--secondary-color);
-}
-
-.compra-item h4 {
-    margin: 0 0 5px 0;
-    color: var(--primary-color);
-}
-
-.compra-item p {
-    margin: 5px 0;
-    color: #666;
-}
-
-.compra-item small {
-    color: #999;
-    font-size: 0.8rem;
-}
-
-.loading {
-    text-align: center;
-    padding: 30px;
-    color: #666;
-    grid-column: 1 / -1;
-}
-
-.error {
-    text-align: center;
-    padding: 30px;
-    color: var(--danger-color);
-    grid-column: 1 / -1;
-}
-
+/* Estilos responsive */
 @media (max-width: 768px) {
-    .usuarios-filtros {
-        flex-direction: column;
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 0;
     }
     
-    .usuarios-list {
-        grid-template-columns: 1fr;
+    main {
+        padding-top: 1rem;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }
 
-
-/* Modal de usuario */
-#usuario-form .form-group {
-    margin-bottom: 15px;
-}
-
-#usuario-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-#usuario-form input,
-#usuario-form select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-#usuario-form select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 1em;
-}
-
-.pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.pagination-controls button {
-    padding: 8px 16px;
-}
-
-#pagination-info {
-    font-size: 0.9rem;
-    color: #666;
-}
-
-
-/*side bar*/
-:root {
-    --sidebar-width: 280px;
-}
-
-/* Sidebar */
-/* Variables de color */
-:root {
-    --primary-color: #2d3436;
-    --secondary-color: #0984e3;
-    --accent-color: #00cec9;
-    --light-color: #f5f6fa;
-    --dark-color: #2f3640;
-    --danger-color: #d63031;
-    --sidebar-width: 280px;
-}
-
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f1f2f6;
-    overflow-x: hidden;
-}
-
-.dashboard-container {
-    display: flex;
-    min-height: 100vh;
+/* Estilos para los displays en las tarjetas de estadísticas */
+.display-4 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1.2;
 }
