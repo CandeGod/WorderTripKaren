@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventos - Wondertrip</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+  <link rel="stylesheet" href="eventos.css">
+  <link rel="stylesheet" href="../../user.css">
+</head>
+
+<body>
+  <div class="user-dashboard">
+    <!-- App Bar Superior -->
+    <header class="app-bar">
+      <div class="app-bar-brand">
+        <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd" alt="Wondertrip Logo" class="logo">
+        <h1>Wondertrip</h1>
+      </div>
+      
+      <nav class="app-bar-nav">
+        <ul>
+          <li><a href="../../user.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="active"><a href="eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+          <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+          <li><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios</a></li>
+          <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+          <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+          <li><a href="../compras/compras.html"><i class="fas fa-receipt"></i> Mis Compras</a></li>
+        </ul>
+      </nav>
+      
+      <div class="user-profile">
+        <div class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="badge" id="notification-count">0</span>
+        </div>
+        <div class="profile-dropdown">
+          <img id="user-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d" alt="User Profile">
+          <span id="user-name">Cargando...</span>
+          <div class="dropdown-content">
+            <a href="../perfil/perfil.html"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+            <a href="../reportes/reportes.html"><i class="fas fa-flag"></i> Mis Reportes</a>
+            <a id="logout-btn" href="../../../index.html"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+      <!-- Header del módulo -->
+      <section class="module-header">
+        <div class="header-content">
+          <h2><i class="fas fa-calendar-alt"></i> Eventos Turísticos</h2>
+          <p>Descubre los eventos más emocionantes en tus destinos favoritos</p>
+        </div>
+        <div class="header-actions">
+          <div class="search-box">
+            <input type="text" placeholder="Buscar eventos..." id="search-input">
+            <button id="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-dropdown">
+            <select id="filter-select">
+              <option value="all">Todos los eventos</option>
+              <option value="upcoming">Próximos eventos</option>
+              <option value="past">Eventos pasados</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección principal de eventos -->
+      <section class="events-section">
+        <div class="events-container" id="events-container">
+          <!-- Eventos se cargarán aquí -->
+        </div>
+      </section>
+
+      <!-- Modal de Detalles de Evento -->
+      <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="eventModalTitle">Detalles del Evento</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="eventModalBody">
+              <!-- Contenido del modal se cargará aquí -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-primary" id="bookEventBtn">Reservar Ahora</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="user-footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd" alt="Wondertrip">
+          <p>Descubre el mundo con nosotros</p>
+        </div>
+        <div class="footer-links">
+          <div class="link-group">
+            <h4>Explorar</h4>
+            <a href="../paquetes/paquetes.html">Paquetes</a>
+            <a href="../eventos/eventos.html">Eventos</a>
+            <a href="../tours/tours.html">Tours</a>
+          </div>
+          <div class="link-group">
+            <h4>Ayuda</h4>
+            <a href="#">Contacto</a>
+            <a href="#">Preguntas Frecuentes</a>
+            <a href="../reportes/reportes.html">Reportar Problema</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2023 Wondertrip. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal de Carga -->
+  <div class="modal-loading" id="loading-modal">
+    <div class="loading-content">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p>Cargando eventos...</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="eventos.js"></script>
+</body>
+</html>

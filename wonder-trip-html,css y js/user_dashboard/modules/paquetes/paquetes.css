@@ -1,0 +1,359 @@
+/* Estilos base - Heredados del dashboard principal */
+:root {
+  --primary-color: #2a9d8f;
+  --secondary-color: #264653;
+  --accent-color: #e9c46a;
+  --danger-color: #e76f51;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --text-color: #495057;
+  --text-light: #6c757d;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Estructura principal - Heredada del dashboard */
+.user-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-bar, .user-footer {
+  /* Estilos heredados del dashboard */
+}
+
+/* Estilos específicos del módulo de paquetes */
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.header-content h2 {
+  font-size: 2rem;
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-content p {
+  color: var(--text-light);
+  margin-top: 0.5rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  box-shadow: var(--shadow);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  min-width: 250px;
+}
+
+.search-box button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.filter-dropdown select {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+/* Contenedor de paquetes */
+.packages-section {
+  margin-top: 1rem;
+}
+
+.packages-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.package-card {
+  background: white;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.package-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--accent-color);
+  color: var(--secondary-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.package-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.package-body {
+  padding: 1.25rem;
+}
+
+.package-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.package-description {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.package-duration {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.package-duration i {
+  color: var(--primary-color);
+}
+
+.package-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.package-price {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.package-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.package-button:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Modal de detalles */
+.modal-content {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.modal-header {
+  background-color: var(--primary-color);
+  color: white;
+  border-bottom: none;
+}
+
+.modal-title {
+  font-weight: 600;
+}
+
+.btn-close {
+  filter: invert(1);
+}
+
+.package-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.package-modal-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.package-modal-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.package-modal-description {
+  grid-column: span 2;
+}
+
+.package-info-group h5 {
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.package-info-group p {
+  color: var(--text-color);
+}
+
+.package-sites {
+  grid-column: span 2;
+}
+
+.site-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
+  margin-bottom: 0.5rem;
+}
+
+.site-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.site-info h6 {
+  margin-bottom: 0.25rem;
+  color: var(--secondary-color);
+}
+
+.site-info p {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Modal de pago */
+#payment-method {
+  margin-bottom: 1rem;
+}
+
+#card-details {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#payment-amount {
+  color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .module-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+  
+  .package-modal-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .package-modal-description, .package-sites {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .packages-container {
+    grid-template-columns: 1fr;
+  }
+}/* Controles de Paginación */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.pagination-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-button:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+}
+
+#page-info {
+  font-weight: 500;
+  color: var(--secondary-color);
+}

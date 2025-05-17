@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.rol === "ADMINISTRADOR") {
                 window.location.href = "admin_dashboard/index.html";
             } else {
-                window.location.href = 'html/user_dashboard.html';
+                window.location.href = 'user_dashboard/user.html';
             }
         })
         .catch(error => {
