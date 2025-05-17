@@ -1,104 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sitios Turísticos - Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="sitios.css">
 </head>
-
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="../../index.html">
-                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../eventos/eventos.html">
-                                <i class="bi bi-calendar-event me-2"></i>Eventos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../paquetes/paquetes.html">
-                                <i class="bi bi-box-seam me-2"></i>Paquetes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="../sitios/sitios.html">
-                                <i class="bi bi-map me-2"></i>Sitios Turísticos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../tours/tours.html">
-                                <i class="bi bi-signpost-split me-2"></i>Tours
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../hoteles/hoteles.html">
-                                <i class="bi bi-building me-2"></i>Hoteles
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../compras/compras.html">
-                                <i class="bi bi-credit-card me-2"></i>Compras
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../usuarios/usuarios.html">
-                                <i class="bi bi-people me-2"></i>Usuarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../reportes/reportes.html">
-                                <i class="bi bi-flag me-2"></i>Reportes
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Admin Profile" class="admin-avatar" id="admin-avatar">
+                <h3 id="admin-name">Cargando...</h3>
+                <p id="admin-email"></p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="../../index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+                    <li class="active"><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+                    <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                    <li><a href="../compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
+                    <li><a href="../usuarios/usuarios.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                    <li><a href="../reportes/reportes.html"><i class="fas fa-flag"></i> Reportes</a></li>
+                </ul>
             </nav>
 
-            <!-- Main Content - Manteniendo EXACTAMENTE las mismas clases y estructura original -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="sitios-container">
-                    <header class="sitios-header">
-                        <h1>Gestión de Sitios Turísticos</h1>
-                        <button id="nuevo-sitio-btn" class="btn-primary">
-                            <i class="fas fa-plus"></i> Nuevo Sitio
-                        </button>
-                    </header>
+            <div class="sidebar-footer">
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
 
-                    <div class="sitios-filtros">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Gestión de Sitios Turísticos</h1>
+                <div class="header-actions">
+                    <button id="nuevo-sitio-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Sitio
+                    </button>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notification-count">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Filtros -->
+                <div class="card mb-4">
+                    <div class="card-body">
                         <div class="search-box">
-                            <input type="text" id="buscar-sitio" placeholder="Buscar sitios...">
+                            <input type="text" id="buscar-sitio" class="form-control" placeholder="Buscar sitios...">
                             <i class="fas fa-search"></i>
                         </div>
                     </div>
+                </div>
 
-                    <div class="sitios-list" id="sitios-list">
-                        <!-- Aquí se cargarán los sitios dinámicamente -->
-                        <div class="loading">Cargando sitios turísticos...</div>
-                    </div>
-
-                    <div class="pagination" id="pagination">
-                        <!-- Paginación se cargará dinámicamente -->
+                <!-- Lista de sitios -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="sitios-list" id="sitios-list">
+                            <div class="text-center py-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </main>
-        </div>
+
+                <!-- Paginación -->
+                <nav aria-label="Page navigation" class="mt-3">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+                </nav>
+            </div>
+        </main>
     </div>
 
-    <!-- Modal para crear/editar sitios - Manteniendo EXACTAMENTE las mismas clases -->
+    <!-- Modal para crear/editar sitios -->
     <div class="modal" id="sitio-modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -106,48 +95,48 @@
             <form id="sitio-form">
                 <input type="hidden" id="sitio-id">
 
-                <div class="form-group">
-                    <label for="sitio-nombre">Nombre</label>
-                    <input type="text" id="sitio-nombre" required>
+                <div class="mb-3">
+                    <label for="sitio-nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="sitio-nombre" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="sitio-descripcion">Descripción</label>
-                    <textarea id="sitio-descripcion" rows="3" required></textarea>
+                <div class="mb-3">
+                    <label for="sitio-descripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="sitio-descripcion" rows="3" required></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="sitio-ubicacion">Ubicación</label>
-                    <input type="text" id="sitio-ubicacion" required>
+                <div class="mb-3">
+                    <label for="sitio-ubicacion" class="form-label">Ubicación</label>
+                    <input type="text" class="form-control" id="sitio-ubicacion" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="sitio-imagen">URL de la imagen principal</label>
-                    <input type="url" id="sitio-imagen" placeholder="https://example.com/image.jpg">
+                <div class="mb-3">
+                    <label for="sitio-imagen" class="form-label">URL de la imagen principal</label>
+                    <input type="url" class="form-control" id="sitio-imagen" placeholder="https://example.com/image.jpg">
                 </div>
 
-                <div class="form-group">
-                    <label for="sitio-hotel">Hotel asociado</label>
-                    <select id="sitio-hotel">
+                <div class="mb-3">
+                    <label for="sitio-hotel" class="form-label">Hotel asociado</label>
+                    <select class="form-control" id="sitio-hotel">
                         <!-- Se llenará dinámicamente -->
                     </select>
                 </div>
 
-                <div class="form-actions">
-                    <button type="button" id="cancelar-sitio" class="btn-secondary">Cancelar</button>
-                    <button type="submit" id="guardar-sitio" class="btn-primary">Guardar</button>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" id="cancelar-sitio" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="guardar-sitio" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de confirmación - Manteniendo EXACTAMENTE las mismas clases -->
+    <!-- Modal de confirmación -->
     <div class="modal" id="confirm-modal">
         <div class="modal-content small">
             <h3 id="confirm-message">¿Estás seguro que deseas eliminar este sitio turístico?</h3>
-            <div class="confirm-actions">
-                <button id="confirm-cancel" class="btn-secondary">Cancelar</button>
-                <button id="confirm-ok" class="btn-danger">Eliminar</button>
+            <div class="d-flex justify-content-end gap-2">
+                <button id="confirm-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="confirm-ok" class="btn btn-danger">Eliminar</button>
             </div>
         </div>
     </div>

@@ -1,7 +1,62 @@
 import { handleApiError } from '../../../js/shared/utils.js';
 
+// Función para verificar autenticación
+function checkAuth() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'ADMINISTRADOR') {
+        window.location.href = '../../index.html';
+        return null;
+    }
+    return userData;
+}
+
+// Mostrar información del administrador
+function displayAdminInfo(userData) {
+    document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
+    document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
+    
+    const adminAvatar = document.getElementById('admin-avatar');
+    adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
+}
+
+// Configurar logout
+function setupLogout() {
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+    });
+}
+
+// Cargar reportes pendientes para notificaciones
+async function loadPendingReports() {
+    try {
+        const response = await fetch('http://localhost:8080/api/reportes?page=0&size=1', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('notification-count').textContent = data.totalElements || '0';
+        }
+    } catch (error) {
+        console.error('Error loading reports:', error);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar autenticación
+    const userData = checkAuth();
+    if (!userData) return;
+    
+    // Configurar UI de administrador
+    displayAdminInfo(userData);
+    setupLogout();
+    loadPendingReports();
+    
+    // Inicializar la aplicación de paquetes
     const paquetesApp = new PaquetesApp();
     paquetesApp.init();
 });
@@ -23,7 +78,11 @@ class PaquetesApp {
 
     async loadSitiosTuristicos() {
         try {
-            const response = await fetch('http://localhost:8080/api/sitios-turisticos');
+            const response = await fetch('http://localhost:8080/api/sitios-turisticos', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar sitios turísticos');
             this.sitiosTuristicos = await response.json();
         } catch (error) {
@@ -81,39 +140,46 @@ class PaquetesApp {
     }
 
     async loadPaquetes() {
-    const paquetesList = document.getElementById('paquetes-list');
-    paquetesList.innerHTML = '<div class="loading">Cargando paquetes...</div>';
+        const paquetesList = document.getElementById('paquetes-list');
+        paquetesList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+        
+        try {
+            let paquetes = [];
 
-    try {
-        let paquetes = [];
-
-        if (this.searchQuery && !isNaN(this.searchQuery)) {
-            // Buscar por ID
-            const response = await fetch(`http://localhost:8080/api/paquetes/${this.searchQuery}`);
-            if (response.ok) {
-                const paquete = await response.json();
-                paquetes = [paquete]; // Mostrar en arreglo
+            if (this.searchQuery && !isNaN(this.searchQuery)) {
+                // Buscar por ID
+                const response = await fetch(`http://localhost:8080/api/paquetes/${this.searchQuery}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    }
+                });
+                if (response.ok) {
+                    const paquete = await response.json();
+                    paquetes = [paquete]; // Mostrar en arreglo
+                }
+            } else {
+                // Cargar todos los paquetes
+                const response = await fetch('http://localhost:8080/api/paquetes', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    }
+                });
+                if (!response.ok) throw new Error('Error al cargar paquetes');
+                paquetes = await response.json();
             }
-        } else {
-            // Cargar todos los paquetes
-            const response = await fetch('http://localhost:8080/api/paquetes');
-            if (!response.ok) throw new Error('Error al cargar paquetes');
-            paquetes = await response.json();
+
+            this.displayPaquetes(paquetes);
+        } catch (error) {
+            handleApiError(error);
+            paquetesList.innerHTML = `<div class="alert alert-danger">Error al cargar paquetes: ${error.message}</div>`;
         }
-
-        this.displayPaquetes(paquetes);
-    } catch (error) {
-        handleApiError(error);
-        paquetesList.innerHTML = `<div class="error">Error al cargar paquetes: ${error.message}</div>`;
     }
-}
-
 
     displayPaquetes(paquetes) {
         const paquetesList = document.getElementById('paquetes-list');
         
         if (paquetes.length === 0) {
-            paquetesList.innerHTML = '<div class="loading">No se encontraron paquetes</div>';
+            paquetesList.innerHTML = '<div class="text-center py-3">No se encontraron paquetes</div>';
             return;
         }
 
@@ -171,7 +237,7 @@ class PaquetesApp {
             document.getElementById('paquete-descripcion').value = paquete.descripcion;
             document.getElementById('paquete-precio').value = paquete.precio;
             
-            // Cargar sitios incluidos (esto sería mejor con un endpoint específico)
+            // Cargar sitios incluidos
             this.selectedSitios = new Set(paquete.sitiosIncluidos || []);
         } else {
             document.getElementById('modal-title').textContent = 'Nuevo Paquete';
@@ -216,70 +282,72 @@ class PaquetesApp {
         document.getElementById(modalId).style.display = 'none';
     }
 
-   async savePaquete() {
-    const form = document.getElementById('paquete-form');
-    const id = document.getElementById('paquete-id').value;
-    const isNew = !id;
-
-    const paqueteData = {
-        nombre: document.getElementById('paquete-nombre').value,
-        descripcion: document.getElementById('paquete-descripcion').value,
-        precio: parseFloat(document.getElementById('paquete-precio').value)
-    };
-
-    try {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userData.token || ''}`
+    async savePaquete() {
+        const form = document.getElementById('paquete-form');
+        const id = document.getElementById('paquete-id').value;
+        const isNew = !id;
+        
+        const paqueteData = {
+            nombre: document.getElementById('paquete-nombre').value,
+            descripcion: document.getElementById('paquete-descripcion').value,
+            precio: parseFloat(document.getElementById('paquete-precio').value)
         };
 
-        let response;
+        try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            };
 
-        if (isNew) {
-            response = await fetch('http://localhost:8080/api/paquetes', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(paqueteData)
-            });
-        } else {
-            response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {
-                method: 'PUT',
-                headers,
-                body: JSON.stringify(paqueteData)
-            });
+            let response;
+            
+            if (isNew) {
+                response = await fetch('http://localhost:8080/api/paquetes', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(paqueteData)
+                });
+            } else {
+                response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(paqueteData)
+                });
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al guardar el paquete');
+            }
+
+            const savedPaquete = await response.json();
+
+            // Asociar sitios al paquete
+            for (const sitioId of this.selectedSitios) {
+                await fetch('http://localhost:8080/api/paquetes/agregar-sitio', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        paqueteId: savedPaquete.id,
+                        sitioId: sitioId
+                    })
+                });
+            }
+
+            this.closeModal('paquete-modal');
+            this.loadPaquetes();
+        } catch (error) {
+            handleApiError(error);
         }
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al guardar el paquete');
-        }
-
-        const savedPaquete = await response.json(); // ⬅️ Obtener el ID del paquete creado
-
-        // Asociar sitios al paquete
-        for (const sitioId of this.selectedSitios) {
-            await fetch('http://localhost:8080/api/paquetes/agregar-sitio', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    paqueteId: savedPaquete.id,
-                    sitioId: sitioId
-                })
-            });
-        }
-
-        this.closeModal('paquete-modal');
-        this.loadPaquetes();
-    } catch (error) {
-        handleApiError(error);
     }
-}
-
 
     async editPaquete(id) {
         try {
-            const response = await fetch(`http://localhost:8080/api/paquetes/${id}`);
+            const response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar el paquete');
             
             const paquete = await response.json();
@@ -301,9 +369,8 @@ class PaquetesApp {
 
     async deletePaquete(id) {
         try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
             const headers = {
-                'Authorization': `Bearer ${userData.token || ''}`
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             };
 
             const response = await fetch(`http://localhost:8080/api/paquetes/${id}`, {

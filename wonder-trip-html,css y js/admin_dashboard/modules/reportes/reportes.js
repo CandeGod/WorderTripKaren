@@ -1,6 +1,62 @@
 import { handleApiError } from '../../../js/shared/utils.js';
 
-document.addEventListener('DOMContentLoaded', function () {
+// Función para verificar autenticación
+function checkAuth() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'ADMINISTRADOR') {
+        window.location.href = '../../index.html';
+        return null;
+    }
+    return userData;
+}
+
+// Mostrar información del administrador
+function displayAdminInfo(userData) {
+    document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
+    document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
+    
+    const adminAvatar = document.getElementById('admin-avatar');
+    adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
+}
+
+// Configurar logout
+function setupLogout() {
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+    });
+}
+
+// Cargar reportes pendientes para notificaciones
+async function loadPendingReports() {
+    try {
+        const response = await fetch('http://localhost:8080/api/reportes?page=0&size=1', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('notification-count').textContent = data.totalElements || '0';
+        }
+    } catch (error) {
+        console.error('Error loading reports:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar autenticación
+    const userData = checkAuth();
+    if (!userData) return;
+    
+    // Configurar UI de administrador
+    displayAdminInfo(userData);
+    setupLogout();
+    loadPendingReports();
+    
+    // Inicializar la aplicación de reportes
     const reportesApp = new ReportesApp();
     reportesApp.init();
 });

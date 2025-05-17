@@ -1,8 +1,62 @@
 import { handleApiError } from '../../../js/shared/utils.js';
 
+// Función para verificar autenticación
+function checkAuth() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'ADMINISTRADOR') {
+        window.location.href = '../../index.html';
+        return null;
+    }
+    return userData;
+}
 
+// Mostrar información del administrador
+function displayAdminInfo(userData) {
+    document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
+    document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
+    
+    const adminAvatar = document.getElementById('admin-avatar');
+    adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
+}
+
+// Configurar logout
+function setupLogout() {
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+    });
+}
+
+// Cargar reportes pendientes para notificaciones
+async function loadPendingReports() {
+    try {
+        const response = await fetch('http://localhost:8080/api/reportes?page=0&size=1', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('notification-count').textContent = data.totalElements || '0';
+        }
+    } catch (error) {
+        console.error('Error loading reports:', error);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar autenticación
+    const userData = checkAuth();
+    if (!userData) return;
+    
+    // Configurar UI de administrador
+    displayAdminInfo(userData);
+    setupLogout();
+    loadPendingReports();
+    
+    // Inicializar la aplicación de eventos
     const eventosApp = new EventosApp();
     eventosApp.init();
 });
@@ -24,7 +78,11 @@ class EventosApp {
 
     async loadSitiosTuristicos() {
         try {
-            const response = await fetch('http://localhost:8080/api/sitios-turisticos');
+            const response = await fetch('http://localhost:8080/api/sitios-turisticos', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar sitios turísticos');
             this.sitiosTuristicos = await response.json();
             this.populateSitiosDropdown();
@@ -101,7 +159,7 @@ class EventosApp {
 
     async loadEventos() {
         const eventosList = document.getElementById('eventos-list');
-        eventosList.innerHTML = '<div class="loading">Cargando eventos...</div>';
+        eventosList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
         
         try {
             const url = new URL('http://localhost:8080/api/eventos');
@@ -113,7 +171,11 @@ class EventosApp {
                 url.searchParams.append('search', this.searchQuery);
             }
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar eventos');
             
             const data = await response.json();
@@ -121,7 +183,7 @@ class EventosApp {
             this.setupPagination(data.totalPages, this.currentPage);
         } catch (error) {
             handleApiError(error);
-            eventosList.innerHTML = `<div class="error">Error al cargar eventos: ${error.message}</div>`;
+            eventosList.innerHTML = `<div class="alert alert-danger">Error al cargar eventos: ${error.message}</div>`;
         }
     }
 
@@ -129,7 +191,7 @@ class EventosApp {
         const eventosList = document.getElementById('eventos-list');
         
         if (eventos.length === 0) {
-            eventosList.innerHTML = '<div class="loading">No se encontraron eventos</div>';
+            eventosList.innerHTML = '<div class="text-center py-3">No se encontraron eventos</div>';
             return;
         }
 
@@ -184,42 +246,43 @@ class EventosApp {
         if (totalPages <= 1) return;
         
         // Botón Anterior
-        const prevButton = document.createElement('button');
-        prevButton.innerHTML = '&laquo;';
-        prevButton.disabled = currentPage === 0;
-        prevButton.addEventListener('click', () => {
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 0 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+        prevLi.addEventListener('click', (e) => {
+            e.preventDefault();
             if (currentPage > 0) {
                 this.currentPage--;
                 this.loadEventos();
             }
         });
-        pagination.appendChild(prevButton);
+        pagination.appendChild(prevLi);
         
         // Números de página
         for (let i = 0; i < totalPages; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.textContent = i + 1;
-            if (i === currentPage) {
-                pageButton.className = 'active';
-            }
-            pageButton.addEventListener('click', () => {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+            li.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.currentPage = i;
                 this.loadEventos();
             });
-            pagination.appendChild(pageButton);
+            pagination.appendChild(li);
         }
         
         // Botón Siguiente
-        const nextButton = document.createElement('button');
-        nextButton.innerHTML = '&raquo;';
-        nextButton.disabled = currentPage === totalPages - 1;
-        nextButton.addEventListener('click', () => {
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+        nextLi.addEventListener('click', (e) => {
+            e.preventDefault();
             if (currentPage < totalPages - 1) {
                 this.currentPage++;
                 this.loadEventos();
             }
         });
-        pagination.appendChild(nextButton);
+        pagination.appendChild(nextLi);
     }
 
     openEventoModal(evento = null) {
@@ -262,10 +325,9 @@ class EventosApp {
         };
 
         try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userData.token || ''}`
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             };
 
             let response;
@@ -298,7 +360,11 @@ class EventosApp {
 
     async editEvento(id) {
         try {
-            const response = await fetch(`http://localhost:8080/api/eventos/${id}`);
+            const response = await fetch(`http://localhost:8080/api/eventos/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar el evento');
             
             const evento = await response.json();
@@ -320,9 +386,8 @@ class EventosApp {
 
     async deleteEvento(id) {
         try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
             const headers = {
-                'Authorization': `Bearer ${userData.token || ''}`
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             };
 
             const response = await fetch(`http://localhost:8080/api/eventos/${id}`, {

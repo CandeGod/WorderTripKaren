@@ -1,3 +1,66 @@
+import { handleApiError } from '../../../js/shared/utils.js';
+
+// Función para verificar autenticación
+function checkAuth() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'ADMINISTRADOR') {
+        window.location.href = '../../index.html';
+        return null;
+    }
+    return userData;
+}
+
+// Mostrar información del administrador
+function displayAdminInfo(userData) {
+    document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
+    document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
+    
+    const adminAvatar = document.getElementById('admin-avatar');
+    adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
+}
+
+// Configurar logout
+function setupLogout() {
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+    });
+}
+
+// Cargar reportes pendientes para notificaciones
+async function loadPendingReports() {
+    try {
+        const response = await fetch('http://localhost:8080/api/reportes?page=0&size=1', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('notification-count').textContent = data.totalElements || '0';
+        }
+    } catch (error) {
+        console.error('Error loading reports:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar autenticación
+    const userData = checkAuth();
+    if (!userData) return;
+    
+    // Configurar UI de administrador
+    displayAdminInfo(userData);
+    setupLogout();
+    loadPendingReports();
+    
+    // Inicializar la aplicación de tours
+    const toursApp = new ToursApp();
+    toursApp.init();
+});
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
 class ToursApp {
@@ -18,7 +81,11 @@ class ToursApp {
 
     async loadSitiosTuristicos() {
         try {
-            const response = await fetch(`${API_BASE_URL}/sitios-turisticos`);
+            const response = await fetch(`${API_BASE_URL}/sitios-turisticos`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar sitios turísticos');
             
             this.sitiosData = await response.json();
@@ -52,7 +119,11 @@ class ToursApp {
                 url += `&duracionMin=${min || 1}&duracionMax=${max || 24}`;
             }
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar tours');
             
             const data = await response.json();
@@ -92,10 +163,10 @@ class ToursApp {
                 <td>${sitio.nombre || 'No asignado'}</td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary me-1 editar-tour" data-id="${tour.idTour}">
-                        <i class="bi bi-pencil"></i>
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger eliminar-tour" data-id="${tour.idTour}" data-nombre="${tour.nombre}">
-                        <i class="bi bi-trash"></i>
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
@@ -347,7 +418,11 @@ class ToursApp {
 
     async openEditModal(tourId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/tours/${tourId}`);
+            const response = await fetch(`${API_BASE_URL}/tours/${tourId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
             if (!response.ok) throw new Error('Error al cargar tour');
             
             const tour = await response.json();
@@ -400,9 +475,3 @@ class ToursApp {
         }, 3000);
     }
 }
-
-// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    const toursApp = new ToursApp();
-    toursApp.init();
-});

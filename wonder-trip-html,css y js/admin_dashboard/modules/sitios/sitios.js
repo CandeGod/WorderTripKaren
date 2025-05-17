@@ -1,6 +1,62 @@
 import { handleApiError } from '../../../js/shared/utils.js';
 
+// Función para verificar autenticación
+function checkAuth() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (!userData || userData.rol !== 'ADMINISTRADOR') {
+        window.location.href = '../../index.html';
+        return null;
+    }
+    return userData;
+}
+
+// Mostrar información del administrador
+function displayAdminInfo(userData) {
+    document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
+    document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
+    
+    const adminAvatar = document.getElementById('admin-avatar');
+    adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
+}
+
+// Configurar logout
+function setupLogout() {
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+    });
+}
+
+// Cargar reportes pendientes para notificaciones
+async function loadPendingReports() {
+    try {
+        const response = await fetch('http://localhost:8080/api/reportes?page=0&size=1', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('notification-count').textContent = data.totalElements || '0';
+        }
+    } catch (error) {
+        console.error('Error loading reports:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar autenticación
+    const userData = checkAuth();
+    if (!userData) return;
+    
+    // Configurar UI de administrador
+    displayAdminInfo(userData);
+    setupLogout();
+    loadPendingReports();
+    
+    // Inicializar la aplicación de sitios turísticos
     const sitiosApp = new SitiosTuristicosApp();
     sitiosApp.init();
 });
@@ -79,38 +135,37 @@ class SitiosTuristicosApp {
         };
     }
 
-   async loadSitiosTuristicos() {
-    const sitiosList = document.getElementById('sitios-list');
-    sitiosList.innerHTML = '<div class="loading">Cargando sitios turísticos...</div>';
+    async loadSitiosTuristicos() {
+        const sitiosList = document.getElementById('sitios-list');
+        sitiosList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
 
-    try {
-        let url = 'http://localhost:8080/api/sitios-turisticos';
+        try {
+            let url = 'http://localhost:8080/api/sitios-turisticos';
 
-        if (this.searchQuery) {
-            url += `/${encodeURIComponent(this.searchQuery)}`;
+            if (this.searchQuery) {
+                url += `/${encodeURIComponent(this.searchQuery)}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Error al cargar sitios turísticos');
+
+            const data = await response.json();
+
+            // Si la respuesta es un objeto individual, conviértelo en array
+            const sitios = Array.isArray(data) ? data : [data];
+
+            this.displaySitios(sitios);
+        } catch (error) {
+            handleApiError(error);
+            sitiosList.innerHTML = `<div class="alert alert-danger">Error al cargar sitios: ${error.message}</div>`;
         }
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error al cargar sitios turísticos');
-
-        const data = await response.json();
-
-        // ✅ Si la respuesta es un objeto individual, conviértelo en array
-        const sitios = Array.isArray(data) ? data : [data];
-
-        this.displaySitios(sitios);
-    } catch (error) {
-        handleApiError(error);
-        sitiosList.innerHTML = `<div class="error">Error al cargar sitios: ${error.message}</div>`;
     }
-}
-
 
     displaySitios(sitios) {
         const sitiosList = document.getElementById('sitios-list');
         
         if (sitios.length === 0) {
-            sitiosList.innerHTML = '<div class="loading">No se encontraron sitios turísticos</div>';
+            sitiosList.innerHTML = '<div class="text-center py-3">No se encontraron sitios turísticos</div>';
             return;
         }
 
@@ -120,7 +175,7 @@ class SitiosTuristicosApp {
             const sitioCard = document.createElement('div');
             sitioCard.className = 'sitio-card';
             sitioCard.innerHTML = `
-                <div class="sitio-imagen" style="background-image: url('${sitio.imagenPrincipal || 'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6'}')">
+                <div class="sitio-imagen" style="background-image: url('${sitio.imagenPrincipal || ''}')">
                     ${!sitio.imagenPrincipal ? '<i class="fas fa-camera fa-3x"></i>' : ''}
                 </div>
                 <div class="sitio-body">
@@ -264,7 +319,7 @@ class SitiosTuristicosApp {
         };
     }
 
-    /*async deleteSitio(id) {
+    async deleteSitio(id) {
         try {
             const userData = JSON.parse(localStorage.getItem('userData'));
             const headers = {
@@ -282,5 +337,5 @@ class SitiosTuristicosApp {
         } catch (error) {
             handleApiError(error);
         }
-    }*/
+    }
 }

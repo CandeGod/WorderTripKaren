@@ -1,84 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administración de Tours</title>
+    <title>Tours - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="tours.css">
 </head>
-
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="../../index.html">
-                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../eventos/eventos.html">
-                                <i class="bi bi-calendar-event me-2"></i>Eventos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../paquetes/paquetes.html">
-                                <i class="bi bi-box-seam me-2"></i>Paquetes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../sitios/sitios.html">
-                                <i class="bi bi-map me-2"></i>Sitios Turísticos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="../tours/tours.html">
-                                <i class="bi bi-signpost-split me-2"></i>Tours
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../hoteles/hoteles.html">
-                                <i class="bi bi-building me-2"></i>Hoteles
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../compras/compras.html">
-                                <i class="bi bi-credit-card me-2"></i>Compras
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../usuarios/usuarios.html">
-                                <i class="bi bi-people me-2"></i>Usuarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../reportes/reportes.html">
-                                <i class="bi bi-flag me-2"></i>Reportes
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Admin Profile" class="admin-avatar" id="admin-avatar">
+                <h3 id="admin-name">Cargando...</h3>
+                <p id="admin-email"></p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="../../index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
+                    <li><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li class="active"><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
+                    <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                    <li><a href="../compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
+                    <li><a href="../usuarios/usuarios.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                    <li><a href="../reportes/reportes.html"><i class="fas fa-flag"></i> Reportes</a></li>
+                </ul>
             </nav>
 
+            <div class="sidebar-footer">
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
 
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div
-                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Administración de Tours</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoTourModal">
-                            <i class="bi bi-plus-circle"></i> Nuevo Tour
-                        </button>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Gestión de Tours</h1>
+                <div class="header-actions">
+                    <button id="nuevo-tour-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoTourModal">
+                        <i class="fas fa-plus"></i> Nuevo Tour
+                    </button>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notification-count">0</span>
                     </div>
                 </div>
+            </header>
 
+            <div class="content">
                 <!-- Filtros -->
                 <div class="card mb-4">
                     <div class="card-body">
@@ -86,8 +61,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="busqueda" class="form-label">Buscar</label>
-                                    <input type="text" class="form-control" id="busqueda"
-                                        placeholder="Nombre o descripción">
+                                    <input type="text" class="form-control" id="busqueda" placeholder="Nombre o descripción">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="orden" class="form-label">Ordenar por</label>
@@ -109,7 +83,7 @@
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="submit" class="btn btn-primary w-100">
-                                        <i class="bi bi-funnel"></i> Filtrar
+                                        <i class="fas fa-filter"></i> Filtrar
                                     </button>
                                 </div>
                             </div>
@@ -173,8 +147,8 @@
                         </nav>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
     <!-- Modal Nuevo Tour -->
@@ -204,8 +178,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="precio" class="form-label">Precio ($)</label>
-                                        <input type="number" class="form-control" id="precio" min="0" step="0.01"
-                                            required>
+                                        <input type="number" class="form-control" id="precio" min="0" step="0.01" required>
                                     </div>
                                 </div>
                             </div>
@@ -220,14 +193,12 @@
                                 <div class="mb-3">
                                     <label for="imagenPortada" class="form-label">URL de la Imagen de Portada</label>
                                     <input type="url" class="form-control" id="imagenPortada" required>
-                                    <small class="text-muted">Ej:
-                                        https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6</small>
+                                    <small class="text-muted">Ej: https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Vista previa</label>
                                     <div class="border p-2 text-center">
-                                        <img id="imagenPreview" src="https://via.placeholder.com/300x200?text=Preview"
-                                            alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
+                                        <img id="imagenPreview" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
                                     </div>
                                 </div>
                             </div>
@@ -243,8 +214,7 @@
     </div>
 
     <!-- Modal Editar Tour -->
-    <div class="modal fade" id="editarTourModal" tabindex="-1" aria-labelledby="editarTourModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editarTourModal" tabindex="-1" aria-labelledby="editarTourModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -271,8 +241,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="editPrecio" class="form-label">Precio ($)</label>
-                                        <input type="number" class="form-control" id="editPrecio" min="0" step="0.01"
-                                            required>
+                                        <input type="number" class="form-control" id="editPrecio" min="0" step="0.01" required>
                                     </div>
                                 </div>
                             </div>
@@ -285,16 +254,13 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="editImagenPortada" class="form-label">URL de la Imagen de
-                                        Portada</label>
+                                    <label for="editImagenPortada" class="form-label">URL de la Imagen de Portada</label>
                                     <input type="url" class="form-control" id="editImagenPortada" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Vista previa</label>
                                     <div class="border p-2 text-center">
-                                        <img id="editImagenPreview"
-                                            src="https://via.placeholder.com/300x200?text=Preview" alt="Preview"
-                                            class="img-fluid rounded" style="max-height: 150px;">
+                                        <img id="editImagenPreview" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview" class="img-fluid rounded" style="max-height: 150px;">
                                     </div>
                                 </div>
                             </div>
@@ -310,14 +276,12 @@
     </div>
 
     <!-- Modal Confirmación Eliminar -->
-    <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>¿Estás seguro de que deseas eliminar este tour? Esta acción no se puede deshacer.</p>
@@ -331,9 +295,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="tours.js" type="module"></script>
 </body>
-
 </html>
