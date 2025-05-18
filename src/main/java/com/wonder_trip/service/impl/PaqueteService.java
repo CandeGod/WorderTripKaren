@@ -3,6 +3,8 @@ package com.wonder_trip.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.wonder_trip.dto.PaqueteConSitiosDTO;
@@ -67,9 +69,11 @@ public class PaqueteService implements IPaqueteService {
     @Override
     public void addSitioToPaquete(PaqueteSitioDTO dto) {
         Paquete paquete = repository.findById(dto.getPaqueteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Paquete no encontrado con ID: " + dto.getPaqueteId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Paquete no encontrado con ID: " + dto.getPaqueteId()));
         SitioTuristico sitio = sitioRepository.findById(dto.getSitioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sitio turístico no encontrado con ID: " + dto.getSitioId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sitio turístico no encontrado con ID: " + dto.getSitioId()));
         paquete.getSitios().add(sitio);
         repository.save(paquete);
     }
@@ -77,9 +81,11 @@ public class PaqueteService implements IPaqueteService {
     @Override
     public void removeSitioFromPaquete(PaqueteSitioDTO dto) {
         Paquete paquete = repository.findById(dto.getPaqueteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Paquete no encontrado con ID: " + dto.getPaqueteId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Paquete no encontrado con ID: " + dto.getPaqueteId()));
         SitioTuristico sitio = sitioRepository.findById(dto.getSitioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sitio turístico no encontrado con ID: " + dto.getSitioId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sitio turístico no encontrado con ID: " + dto.getSitioId()));
         paquete.getSitios().remove(sitio);
         repository.save(paquete);
     }
@@ -127,4 +133,10 @@ public class PaqueteService implements IPaqueteService {
         }).collect(Collectors.toList()));
         return dto;
     }
+
+    @Override
+    public Page<PaqueteDTO> getAllPaged(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
+    }
+
 }

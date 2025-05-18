@@ -94,4 +94,16 @@ public class CompraController {
         return ResponseEntity.ok(service.getAllComprasPaginado(pageable));
     }
 
+    @Operation(summary = "Obtener la suma total de compras de un usuario")
+    @GetMapping("/suma-total/usuario/{usuarioId}")
+    public ResponseEntity<BigDecimal> getSumaTotalPorUsuario(@PathVariable Integer usuarioId) {
+        return ResponseEntity.ok(service.getSumaTotalPorUsuario(usuarioId));
+    }
+
+    @Operation(summary = "Contar el número de compras de un usuario")
+    @GetMapping("/usuario/{usuarioId}/conteo")
+    public ResponseEntity<Long> contarComprasPorUsuario(@PathVariable Integer usuarioId) {
+        return ResponseEntity.ok(service.contarComprasPorUsuario(usuarioId));
+    }
+
 }

@@ -5,12 +5,17 @@ import com.wonder_trip.service.ISitioTuristicoService;
 import com.wonder_trip.service.impl.SitioTuristicoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,5 +66,17 @@ public class SitioTuristicoController {
     public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/paginado")
+    @Operation(summary = "Obtener sitios turísticos paginados", description = "Retorna una página de sitios turísticos")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Página de sitios encontrada")
+    })
+    public ResponseEntity<Page<SitioTuristicoDTO>> getPaged(
+            @Parameter(description = "Número de página", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Tamaño de la página", example = "20") @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(service.getAllPaged(pageable));
     }
 }

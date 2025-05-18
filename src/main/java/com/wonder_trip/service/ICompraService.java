@@ -21,4 +21,7 @@ public interface ICompraService {
     BigDecimal getSumaTotalCompras();
     Page<CompraConDetallesDTO> getAllComprasPaginado(Pageable pageable);
 
+    BigDecimal getSumaTotalPorUsuario(Integer usuarioId);
+    long contarComprasPorUsuario(Integer usuarioId);
+
 }

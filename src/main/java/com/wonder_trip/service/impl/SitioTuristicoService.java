@@ -1,5 +1,6 @@
 package com.wonder_trip.service.impl;
 
+import com.wonder_trip.dto.PaqueteDTO;
 import com.wonder_trip.dto.SitioTuristicoDTO;
 import com.wonder_trip.exception.ResourceNotFoundException;
 import com.wonder_trip.model.Hotel;
@@ -8,6 +9,8 @@ import com.wonder_trip.repository.HotelRepository;
 import com.wonder_trip.repository.SitioTuristicoRepository;
 import com.wonder_trip.service.ISitioTuristicoService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,5 +86,10 @@ public class SitioTuristicoService implements ISitioTuristicoService{
         dto.setHotelId(site.getHotel().getId());
         dto.setImagenPrincipal(site.getImagenPrincipal());
         return dto;
+    }
+
+    @Override
+    public Page<SitioTuristicoDTO> getAllPaged(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

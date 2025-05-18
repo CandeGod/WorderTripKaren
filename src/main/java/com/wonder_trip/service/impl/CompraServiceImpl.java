@@ -115,4 +115,15 @@ public class CompraServiceImpl implements ICompraService {
         return compras.map(this::convertirADetallesDTO);
     }
 
+    @Override
+    public BigDecimal getSumaTotalPorUsuario(Integer usuarioId) {
+        BigDecimal suma = compraRepository.obtenerSumaTotalPorUsuario(usuarioId);
+        return suma != null ? suma : BigDecimal.ZERO;
+    }
+
+    @Override
+    public long contarComprasPorUsuario(Integer usuarioId) {
+        return compraRepository.countByUsuarioId(usuarioId);
+    }
+
 }
