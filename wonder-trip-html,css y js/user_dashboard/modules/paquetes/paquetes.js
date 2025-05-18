@@ -290,38 +290,69 @@ function setupSearchAndFilters() {
 }
 
 // Configurar modal de pago
+// Configurar modal de pago - Versión completa con solución
 function setupPaymentModal() {
     const paymentMethod = document.getElementById('payment-method');
     const cardDetails = document.getElementById('card-details');
     
+    // Mostrar/ocultar detalles de tarjeta según método seleccionado
     paymentMethod.addEventListener('change', (e) => {
-        if (e.target.value === 'TARJETA') {
-            cardDetails.style.display = 'block';
-        } else {
-            cardDetails.style.display = 'none';
-        }
+        cardDetails.style.display = e.target.value === 'TARJETA' ? 'block' : 'none';
     });
     
-    // Confirmar pago
+    // Confirmar pago - Versión mejorada con validaciones
     document.getElementById('confirm-payment').addEventListener('click', async () => {
         try {
             showLoading();
-            const userData = getAuthenticatedUser();
-            if (!userData) return;
             
-            const paymentMethod = document.getElementById('payment-method').value;
-            if (!paymentMethod) {
-                throw new Error('Seleccione un método de pago');
+            // 1. Validar usuario autenticado
+            const userData = getAuthenticatedUser();
+            if (!userData || !userData.id) {
+                throw new Error('No se pudo obtener la información del usuario. Por favor, inicie sesión nuevamente.');
             }
             
-            const today = new Date().toISOString().split('T')[0];
+            // 2. Validar paquete seleccionado
+            if (!currentPackageId) {
+                throw new Error('No se ha seleccionado ningún paquete para comprar.');
+            }
+            
+            // 3. Validar método de pago
+            const paymentMethodValue = paymentMethod.value;
+            if (!paymentMethodValue || !['TARJETA', 'TRANSFERENCIA', 'EFECTIVO'].includes(paymentMethodValue)) {
+                throw new Error('Por favor seleccione un método de pago válido.');
+            }
+            
+            // 4. Validar detalles de tarjeta si es necesario
+            if (paymentMethodValue === 'TARJETA') {
+                const cardNumber = document.getElementById('card-number').value;
+                const cardExpiry = document.getElementById('card-expiry').value;
+                const cardCvv = document.getElementById('card-cvv').value;
+                
+                if (!cardNumber || !cardExpiry || !cardCvv) {
+                    throw new Error('Por favor complete todos los datos de la tarjeta.');
+                }
+                
+                if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
+                    throw new Error('El número de tarjeta debe tener 16 dígitos.');
+                }
+                
+                if (!/^\d{3,4}$/.test(cardCvv)) {
+                    throw new Error('El CVV debe tener 3 o 4 dígitos.');
+                }
+            }
+            
+            // 5. Preparar datos para la API
+            const today = new Date();
             const paymentData = {
-                fechaCompra: today,
-                metodoPago: paymentMethod,
-                paqueteId: currentPackageId,
-                usuarioId: userData.id
+                fechaCompra: today.toISOString().split('T')[0], // Formato YYYY-MM-DD
+                metodoPago: paymentMethodValue,
+                paqueteId: Number(currentPackageId), // Asegurar que es número
+                usuarioId: Number(userData.id) // Asegurar que es número
             };
             
+            console.log('Enviando datos de compra:', paymentData); // Para depuración
+            
+            // 6. Enviar la solicitud
             const response = await fetch(`${API_BASE_URL}/compras`, {
                 method: 'POST',
                 headers: {
@@ -331,30 +362,56 @@ function setupPaymentModal() {
                 body: JSON.stringify(paymentData)
             });
             
+            // 7. Manejar la respuesta
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al procesar el pago');
+                const errorResponse = await response.json().catch(() => null);
+                
+                if (errorResponse && errorResponse.errors) {
+                    // Si el backend devuelve errores de validación detallados
+                    const errorMessages = Object.values(errorResponse.errors).join(', ');
+                    throw new Error(`Error de validación: ${errorMessages}`);
+                } else if (errorResponse && errorResponse.message) {
+                    // Si el backend devuelve un mensaje de error
+                    throw new Error(errorResponse.message);
+                } else {
+                    // Error genérico
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
             }
             
-            const paymentResult = await response.json();
+            // 8. Procesar respuesta exitosa
+            const result = await response.json();
+            console.log('Compra exitosa:', result);
             
             // Cerrar modales
             const packageModal = bootstrap.Modal.getInstance(document.getElementById('packageModal'));
-            packageModal.hide();
+            if (packageModal) packageModal.hide();
             
             const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
-            paymentModal.hide();
+            if (paymentModal) paymentModal.hide();
             
             // Mostrar confirmación
-            showNotification('¡Reserva completada con éxito!');
+            showNotification('¡Compra realizada con éxito! Redirigiendo a tus compras...');
             
-            // Redirigir a compras
+            // Redirigir a la página de compras después de 2 segundos
             setTimeout(() => {
                 window.location.href = '../compras/compras.html';
             }, 2000);
             
         } catch (error) {
-            handleApiError(error);
+            console.error('Error en el proceso de compra:', error);
+            
+            // Mostrar error específico al usuario
+            let errorMessage = error.message;
+            
+            // Manejar errores comunes conocidos
+            if (error.message.includes('failed to fetch')) {
+                errorMessage = 'Error de conexión. Por favor verifique su conexión a internet.';
+            } else if (error.message.toLowerCase().includes('validation')) {
+                errorMessage = 'Datos inválidos: ' + error.message;
+            }
+            
+            showNotification(errorMessage, 'error');
         } finally {
             hideLoading();
         }

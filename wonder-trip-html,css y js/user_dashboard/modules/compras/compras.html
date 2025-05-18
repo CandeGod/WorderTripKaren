@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sitios Turísticos - Wondertrip</title>
+  <title>Mis Compras - Wondertrip</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
-  <link rel="stylesheet" href="sitios.css">
+  <link rel="stylesheet" href="compras.css">
   <link rel="stylesheet" href="../../user.css">
 </head>
 
@@ -26,10 +26,10 @@
           <li><a href="../../user.html"><i class="fas fa-home"></i> Inicio</a></li>
           <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
           <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
-          <li class="active"><a href="sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios</a></li>
+          <li><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios</a></li>
           <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
           <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
-          <li><a href="../compras/compras.html"><i class="fas fa-receipt"></i> Mis Compras</a></li>
+          <li class="active"><a href="compras.html"><i class="fas fa-receipt"></i> Mis Compras</a></li>
         </ul>
       </nav>
       
@@ -55,39 +55,95 @@
       <!-- Header del módulo -->
       <section class="module-header">
         <div class="header-content">
-          <h2><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</h2>
-          <p>Descubre los destinos más impresionantes para tus próximas aventuras</p>
+          <h2><i class="fas fa-receipt"></i> Mis Compras</h2>
+          <p>Historial de todas tus reservas y experiencias adquiridas</p>
+        </div>
+        <div class="header-actions">
+          <div class="date-filter">
+            <input type="date" id="date-from" class="form-control">
+            <span>a</span>
+            <input type="date" id="date-to" class="form-control">
+            <button id="filter-btn" class="btn-filter"><i class="fas fa-filter"></i> Filtrar</button>
+          </div>
         </div>
       </section>
 
-      <!-- Sección principal de sitios -->
-      <section class="sites-section">
-        <div class="sites-container" id="sites-container">
-          <!-- Sitios se cargarán aquí -->
+      <!-- Resumen de compras -->
+      <section class="purchase-summary">
+        <div class="summary-card total-spent">
+          <div class="summary-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="summary-content">
+            <h3 id="total-spent">$0</h3>
+            <p>Total gastado</p>
+          </div>
+        </div>
+        <div class="summary-card purchases-count">
+          <div class="summary-icon">
+            <i class="fas fa-shopping-bag"></i>
+          </div>
+          <div class="summary-content">
+            <h3 id="purchases-count">0</h3>
+            <p>Compras realizadas</p>
+          </div>
+        </div>
+        <div class="summary-card favorite-method">
+          <div class="summary-icon">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <div class="summary-content">
+            <h3 id="favorite-method">-</h3>
+            <p>Método de pago favorito</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gráfico de compras (simulado) -->
+      <section class="purchase-chart">
+        <div class="chart-header">
+          <h3><i class="fas fa-chart-line"></i> Historial de Compras</h3>
+          <div class="chart-legend">
+            <span><i class="fas fa-circle text-primary"></i> Este año</span>
+            <span><i class="fas fa-circle text-muted"></i> Año anterior</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="purchaseChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Listado de compras -->
+      <section class="purchase-list">
+        <div class="list-header">
+          <h3><i class="fas fa-list-ul"></i> Últimas Compras</h3>
+          <div class="pagination-controls">
+            <button id="prev-page" class="btn-pagination" disabled><i class="fas fa-chevron-left"></i></button>
+            <span id="page-indicator">1/1</span>
+            <button id="next-page" class="btn-pagination" disabled><i class="fas fa-chevron-right"></i></button>
+          </div>
         </div>
         
-        <!-- Paginación -->
-        <nav aria-label="Page navigation" class="mt-4">
-          <ul class="pagination justify-content-center" id="pagination">
-            <!-- Paginación se cargará aquí -->
-          </ul>
-        </nav>
+        <div class="purchase-timeline" id="purchases-container">
+          <!-- Compras se cargarán aquí -->
+        </div>
       </section>
 
-      <!-- Modal de Detalles de Sitio -->
-      <div class="modal fade" id="siteModal" tabindex="-1" aria-hidden="true">
+      <!-- Modal de Detalle de Compra -->
+      <div class="modal fade" id="purchaseModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="siteModalTitle">Detalles del Sitio</h5>
+              <h5 class="modal-title" id="purchaseModalTitle">Detalles de Compra</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="siteModalBody">
+            <div class="modal-body" id="purchaseModalBody">
               <!-- Contenido del modal se cargará aquí -->
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <button type="button" class="btn btn-primary" onclick="window.location.href='../tours/tours.html'">Ver Tours</button>
+              <button type="button" class="btn btn-danger" id="cancel-purchase-btn"><i class="fas fa-times-circle"></i> Cancelar Reserva</button>
+              <button type="button" class="btn btn-primary" id="download-receipt-btn"><i class="fas fa-file-pdf"></i> Descargar Recibo</button>
             </div>
           </div>
         </div>
@@ -128,12 +184,12 @@
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
-      <p>Cargando sitios...</p>
+      <p>Cargando tus compras...</p>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-  <script src="sitios.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="compras.js"></script>
 </body>
 </html>
