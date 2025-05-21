@@ -27,4 +27,7 @@ public class ReporteDTO {
     private String fecha; // Se convertirá a LocalDate en el servicio
 
     private Integer idUsuario;
+
+    private String sentimiento;
+
 }

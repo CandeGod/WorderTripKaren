@@ -460,3 +460,46 @@
     flex-direction: column;
   }
 }
+
+/* Estilos para los badges de sentimiento */
+.report-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.sentiment-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sentiment-positive {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.sentiment-negative {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.sentiment-neutral {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.sentiment-mixed {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.sentiment-unknown {
+    background-color: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+}

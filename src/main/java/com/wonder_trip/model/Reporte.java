@@ -38,4 +38,8 @@ public class Reporte {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
+
+    @Column(name = "emocion")
+    private String sentimiento;
+
 }

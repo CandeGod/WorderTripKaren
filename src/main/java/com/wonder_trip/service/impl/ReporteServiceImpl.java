@@ -7,6 +7,7 @@ import com.wonder_trip.model.Usuario;
 import com.wonder_trip.repository.ReporteRepository;
 import com.wonder_trip.repository.UsuarioRepository;
 import com.wonder_trip.service.IReporteService;
+import com.wonder_trip.config.AzureSentimentService;
 import com.wonder_trip.dto.ReporteDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,19 +25,24 @@ public class ReporteServiceImpl implements IReporteService {
     private final ReporteRepository reporteRepository;
     private final UsuarioRepository usuarioRepository;
     private final ModelMapper modelMapper;
+    private final AzureSentimentService azureSentimentService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @Override
+     @Override
     public ReporteDTO create(ReporteDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+
+        // Analizar sentimiento usando Azure
+        String sentimiento = azureSentimentService.analizarSentimiento(dto.getDescripcion());
 
         Reporte reporte = Reporte.builder()
                 .titulo(dto.getTitulo())
                 .descripcion(dto.getDescripcion())
                 .fecha(LocalDate.parse(dto.getFecha(), formatter))
                 .usuario(usuario)
+                .sentimiento(sentimiento)
                 .build();
 
         return modelMapper.map(reporteRepository.save(reporte), ReporteDTO.class);

@@ -12,11 +12,11 @@ function showNotification(message, type = 'success') {
     notification.className = `notification ${type}`;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.classList.add('show');
     }, 10);
-    
+
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
@@ -50,22 +50,22 @@ async function loadProfileData() {
         });
 
         if (!response.ok) throw new Error('Error al cargar datos del perfil');
-        
+
         const profileData = await response.json();
-        
+
         // Mostrar datos en el perfil
         displayProfileData(profileData);
-        
+
         // Cargar datos adicionales
         await Promise.all([
             loadPurchaseSummary(userData.id),
             loadUserReports(userData.id),
             loadUserPurchases(userData.id)
         ]);
-        
+
         // Inicializar gráfico
         initTravelChart();
-        
+
     } catch (error) {
         handleApiError(error);
     } finally {
@@ -80,13 +80,13 @@ function displayProfileData(user) {
     document.getElementById('user-name').textContent = user.nombre;
     document.getElementById('user-avatar').src = user.imagenPerfil || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d';
     document.getElementById('profile-avatar-img').src = user.imagenPerfil || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d';
-    
+
     // Detalles del perfil
     document.getElementById('detail-name').textContent = user.nombre;
     document.getElementById('detail-email').textContent = user.correo;
     document.getElementById('detail-gender').textContent = user.sexo || 'No especificado';
     document.getElementById('detail-role').textContent = user.rol === 'USUARIO' ? 'Usuario' : user.rol;
-    
+
     // Fecha de ingreso (simulada)
     const joinDate = new Date();
     document.getElementById('member-since').textContent = joinDate.getFullYear();
@@ -105,25 +105,25 @@ async function loadPurchaseSummary(userId) {
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
-        
+
         if (totalResponse.ok) {
             const total = await totalResponse.text();
             document.getElementById('total-spent').textContent = `$${parseInt(total || '0').toLocaleString()}`;
         }
-        
+
         // Obtener conteo de compras
         const countResponse = await fetch(`${API_BASE_URL}/compras/usuario/${userId}/conteo`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
-        
+
         if (countResponse.ok) {
             const count = await countResponse.text();
             document.getElementById('purchases-count').textContent = count || '0';
             document.getElementById('trips-count').textContent = count || '0';
         }
-        
+
     } catch (error) {
         console.error('Error al cargar resumen de compras:', error);
     }
@@ -137,12 +137,12 @@ async function loadUserPurchases(userId) {
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
-        
+
         if (!response.ok) throw new Error('Error al cargar compras del usuario');
-        
+
         const purchasesData = await response.json();
         displayRecentPurchases(purchasesData || []);
-        
+
     } catch (error) {
         console.error('Error al cargar compras:', error);
     }
@@ -152,7 +152,7 @@ async function loadUserPurchases(userId) {
 function displayRecentPurchases(purchases) {
     const purchasesList = document.getElementById('purchases-list');
     purchasesList.innerHTML = '';
-    
+
     if (purchases.length === 0) {
         purchasesList.innerHTML = `
             <div class="no-purchases" style="text-align: center; padding: 2rem;">
@@ -162,7 +162,7 @@ function displayRecentPurchases(purchases) {
         `;
         return;
     }
-    
+
     purchases.forEach(purchase => {
         const purchaseDate = new Date(purchase.fechaCompra);
         const formattedDate = purchaseDate.toLocaleDateString('es-MX', {
@@ -170,7 +170,7 @@ function displayRecentPurchases(purchases) {
             month: 'short',
             year: 'numeric'
         });
-        
+
         const purchaseItem = document.createElement('div');
         purchaseItem.className = 'purchase-item';
         purchaseItem.innerHTML = `
@@ -192,12 +192,12 @@ async function loadUserReports(userId) {
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
-        
+
         if (!response.ok) throw new Error('Error al cargar reportes');
-        
+
         const reportsData = await response.json();
         displayUserReports(reportsData.content || []);
-        
+
     } catch (error) {
         console.error('Error al cargar reportes:', error);
     }
@@ -207,7 +207,7 @@ async function loadUserReports(userId) {
 function displayUserReports(reports) {
     const reportsList = document.getElementById('reports-list');
     reportsList.innerHTML = '';
-    
+
     if (reports.length === 0) {
         reportsList.innerHTML = `
             <div class="no-reports" style="text-align: center; padding: 2rem;">
@@ -218,14 +218,14 @@ function displayUserReports(reports) {
                 </button>
             </div>
         `;
-        
+
         // Configurar botón para nuevo reporte
         document.getElementById('btn-new-report')?.addEventListener('click', () => {
             showNewReportModal();
         });
         return;
     }
-    
+
     // Agregar botón para nuevo reporte
     const newReportBtn = document.createElement('button');
     newReportBtn.className = 'btn btn-primary mb-3';
@@ -235,7 +235,7 @@ function displayUserReports(reports) {
         showNewReportModal();
     });
     reportsList.appendChild(newReportBtn);
-    
+
     reports.forEach(report => {
         const reportDate = new Date(report.fecha);
         const formattedDate = reportDate.toLocaleDateString('es-MX', {
@@ -243,25 +243,62 @@ function displayUserReports(reports) {
             month: 'short',
             year: 'numeric'
         });
-        
+
+        // Determinar clase CSS según el sentimiento
+        let sentimentClass = '';
+        switch (report.sentimiento?.toLowerCase()) {
+            case 'positivo':
+                sentimentClass = 'sentiment-positive';
+                break;
+            case 'negativo':
+                sentimentClass = 'sentiment-negative';
+                break;
+            case 'neutral':
+                sentimentClass = 'sentiment-neutral';
+                break;
+            case 'mezclado':
+                sentimentClass = 'sentiment-mixed';
+                break;
+            default:
+                sentimentClass = 'sentiment-unknown';
+        }
+
         const reportItem = document.createElement('div');
         reportItem.className = 'report-item';
         reportItem.innerHTML = `
             <div>
                 <h5 class="report-title"><i class="fas fa-exclamation-circle"></i> ${report.titulo}</h5>
                 <p class="report-description">${report.descripcion}</p>
-                <p class="report-date">${formattedDate}</p>
+                <div class="report-footer">
+                    <p class="report-date">${formattedDate}</p>
+                    <span class="sentiment-badge ${sentimentClass}">
+                        <i class="fas ${getSentimentIcon(report.sentimiento)}"></i> ${report.sentimiento || 'Desconocido'}
+                    </span>
+                </div>
             </div>
         `;
         reportsList.appendChild(reportItem);
     });
 }
 
+// Función auxiliar para obtener icono según sentimiento
+function getSentimentIcon(sentiment) {
+    if (!sentiment) return 'fa-question-circle';
+
+    switch (sentiment.toLowerCase()) {
+        case 'positivo': return 'fa-smile';
+        case 'negativo': return 'fa-frown';
+        case 'neutral': return 'fa-meh';
+        case 'mezclado': return 'fa-surprise';
+        default: return 'fa-question-circle';
+    }
+}
+
 // Mostrar modal para nuevo reporte
 function showNewReportModal() {
     const userData = getAuthenticatedUser();
     if (!userData) return;
-    
+
     const modalHTML = `
         <div class="modal fade" id="newReportModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -290,21 +327,21 @@ function showNewReportModal() {
             </div>
         </div>
     `;
-    
+
     // Agregar modal al DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     const modal = new bootstrap.Modal(document.getElementById('newReportModal'));
-    
+
     // Configurar evento para enviar reporte
     document.getElementById('submit-report-btn').addEventListener('click', async () => {
         const title = document.getElementById('report-title').value;
         const description = document.getElementById('report-description').value;
-        
+
         if (!title || !description) {
             showNotification('Por favor completa todos los campos', 'error');
             return;
         }
-        
+
         try {
             const response = await fetch(`${API_BASE_URL}/reportes`, {
                 method: 'POST',
@@ -319,15 +356,15 @@ function showNewReportModal() {
                     idUsuario: userData.id
                 })
             });
-            
+
             if (!response.ok) throw new Error('Error al enviar el reporte');
-            
+
             showNotification('Reporte enviado correctamente');
             modal.hide();
-            
+
             // Recargar reportes
             await loadUserReports(userData.id);
-            
+
         } catch (error) {
             handleApiError(error);
         } finally {
@@ -337,7 +374,7 @@ function showNewReportModal() {
             });
         }
     });
-    
+
     // Mostrar modal
     modal.show();
 }
@@ -376,36 +413,36 @@ function showChangePasswordModal() {
             </div>
         </div>
     `;
-    
+
     // Agregar modal al DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
-    
+
     // Configurar evento para cambiar contraseña
     document.getElementById('submit-password-btn').addEventListener('click', async () => {
         const currentPassword = document.getElementById('current-password').value;
         const newPassword = document.getElementById('new-password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
-        
+
         if (!currentPassword || !newPassword || !confirmPassword) {
             showNotification('Por favor completa todos los campos', 'error');
             return;
         }
-        
+
         if (newPassword !== confirmPassword) {
             showNotification('Las contraseñas nuevas no coinciden', 'error');
             return;
         }
-        
+
         try {
             const userData = getAuthenticatedUser();
             if (!userData) return;
-            
+
             // Aquí iría la lógica para cambiar la contraseña en el backend
             // Por ahora simulamos que fue exitoso
             showNotification('Contraseña cambiada correctamente');
             modal.hide();
-            
+
         } catch (error) {
             handleApiError(error);
         } finally {
@@ -415,7 +452,7 @@ function showChangePasswordModal() {
             });
         }
     });
-    
+
     // Mostrar modal
     modal.show();
 }
@@ -423,7 +460,7 @@ function showChangePasswordModal() {
 // Inicializar gráfico de viajes
 function initTravelChart() {
     const ctx = document.getElementById('travelChart').getContext('2d');
-    
+
     // Datos simulados para el gráfico
     new Chart(ctx, {
         type: 'doughnut',
@@ -451,7 +488,7 @@ function initTravelChart() {
             cutout: '70%'
         }
     });
-    
+
     // Actualizar preferencia basada en el gráfico (simulado)
     document.getElementById('preference').textContent = "Playas";
     document.getElementById('visited-places').textContent = "8";
@@ -461,16 +498,16 @@ function initTravelChart() {
 function setupTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    
+
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             // Remover clase active de todos los tabs y contenidos
             tabs.forEach(t => t.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
-            
+
             // Agregar clase active al tab clickeado
             tab.classList.add('active');
-            
+
             // Mostrar el contenido correspondiente
             const tabId = tab.getAttribute('data-tab');
             document.getElementById(`${tabId}-tab`).classList.add('active');
@@ -483,7 +520,7 @@ function setupEditModal() {
     const editBtn = document.querySelector('.btn-edit-profile');
     const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
     const userData = getAuthenticatedUser();
-    
+
     editBtn.addEventListener('click', async () => {
         try {
             // Obtener datos actuales del usuario
@@ -492,34 +529,34 @@ function setupEditModal() {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 }
             });
-            
+
             if (!response.ok) throw new Error('Error al cargar datos del usuario');
-            
+
             const currentUserData = await response.json();
-            
+
             // Llenar el formulario con los datos actuales
             document.getElementById('edit-name').value = currentUserData.nombre;
             document.getElementById('edit-email').value = currentUserData.correo;
             document.getElementById('edit-gender').value = currentUserData.sexo || 'Otro';
-            
+
             // Guardar contraseña actual para usarla en la actualización
             document.getElementById('profile-form').dataset.currentPassword = currentUserData.contrasena;
-            
+
             modal.show();
         } catch (error) {
             handleApiError(error);
         }
     });
-    
+
     // Configurar botón de guardar
     document.getElementById('save-profile-btn').addEventListener('click', async () => {
         try {
             const userData = getAuthenticatedUser();
             if (!userData) return;
-            
+
             const form = document.getElementById('profile-form');
             const currentPassword = form.dataset.currentPassword;
-            
+
             const updatedData = {
                 nombre: document.getElementById('edit-name').value,
                 correo: document.getElementById('edit-email').value,
@@ -528,7 +565,7 @@ function setupEditModal() {
                 rol: "USUARIO",
                 imagenPerfil: userData.imagenPerfil || "string"
             };
-            
+
             const response = await fetch(`${API_BASE_URL}/usuarios/${userData.id}`, {
                 method: 'PUT',
                 headers: {
@@ -537,24 +574,24 @@ function setupEditModal() {
                 },
                 body: JSON.stringify(updatedData)
             });
-            
+
             if (!response.ok) throw new Error('Error al actualizar el perfil');
-            
+
             const updatedUser = await response.json();
-            
+
             // Actualizar datos en localStorage
             const storedUserData = JSON.parse(localStorage.getItem('userData'));
             storedUserData.nombre = updatedData.nombre;
             storedUserData.correo = updatedData.correo;
             storedUserData.sexo = updatedData.sexo;
             localStorage.setItem('userData', JSON.stringify(storedUserData));
-            
+
             // Actualizar la UI
             displayProfileData(updatedUser);
-            
+
             showNotification('Perfil actualizado correctamente');
             modal.hide();
-            
+
         } catch (error) {
             handleApiError(error);
         }
@@ -563,7 +600,7 @@ function setupEditModal() {
 
 // Configurar botón de cambio de contraseña
 function setupChangePasswordButton() {
-    document.querySelector('.btn-change-password').addEventListener('click', function(e) {
+    document.querySelector('.btn-change-password').addEventListener('click', function (e) {
         e.preventDefault();
         showChangePasswordModal();
     });
@@ -571,11 +608,11 @@ function setupChangePasswordButton() {
 
 // Configurar logout
 function setupLogout() {
-    document.getElementById('logout-btn').addEventListener('click', function(e) {
+    document.getElementById('logout-btn').addEventListener('click', function (e) {
         e.preventDefault();
         localStorage.removeItem('userData');
         localStorage.removeItem('token');
-        window.location.href = '../../index.html';
+        window.location.href = '../../../index.html';
     });
 }
 
@@ -590,7 +627,7 @@ function hideLoading() {
 }
 
 // Inicializar la aplicación
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     try {
         const userData = getAuthenticatedUser();
         if (!userData) return;
@@ -599,7 +636,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         setupEditModal();
         setupChangePasswordButton(); // Configurar el botón de cambio de contraseña
         setupLogout();
-        
+
         // Cargar datos del perfil
         await loadProfileData();
 

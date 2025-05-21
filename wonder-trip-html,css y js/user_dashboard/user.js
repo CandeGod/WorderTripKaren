@@ -52,7 +52,7 @@ function setupLogout() {
         e.preventDefault();
         localStorage.removeItem('userData');
         localStorage.removeItem('token');
-        window.location.href = '../index.html';
+        window.location.href = '../../../index.html';
     });
 }
 
