@@ -1,5 +1,9 @@
 import { handleApiError } from '../../../js/shared/utils.js';
 
+// Configuración del servicio de visión por computadora
+const VISION_API_KEY = "8BkcnnyOl1nWIHjIhN4itsgr0deAVQKLVREJXi61eNmhuLulqOueJQQJ99BEACYeBjFXJ3w3AAAFACOGwBiz";
+const VISION_ENDPOINT = "https://wonderimage.cognitiveservices.azure.com/";
+
 // Función para verificar autenticación
 function checkAuth() {
     const userData = JSON.parse(localStorage.getItem('userData'));
@@ -14,14 +18,14 @@ function checkAuth() {
 function displayAdminInfo(userData) {
     document.getElementById('admin-name').textContent = userData.nombre || 'Administrador';
     document.getElementById('admin-email').textContent = userData.correo || 'admin@wondertrip.com';
-    
+
     const adminAvatar = document.getElementById('admin-avatar');
     adminAvatar.src = userData.imagenPerfil || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=80&q=80';
 }
 
 // Configurar logout
 function setupLogout() {
-    document.getElementById('logout-btn').addEventListener('click', function() {
+    document.getElementById('logout-btn').addEventListener('click', function () {
         localStorage.removeItem('userData');
         localStorage.removeItem('token');
         window.location.href = '../../index.html';
@@ -36,7 +40,7 @@ async function loadPendingReports() {
                 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
             }
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             document.getElementById('notification-count').textContent = data.totalElements || '0';
@@ -46,16 +50,39 @@ async function loadPendingReports() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// Función para analizar imagen con Azure Computer Vision
+async function analyzeImage(imageUrl) {
+    try {
+        const response = await fetch(`${VISION_ENDPOINT}/vision/v3.2/analyze?visualFeatures=Description,Tags&language=es`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Subscription-Key': VISION_API_KEY
+            },
+            body: JSON.stringify({ url: imageUrl })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al analizar la imagen');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error en análisis de imagen:', error);
+        return null;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
     // Verificar autenticación
     const userData = checkAuth();
     if (!userData) return;
-    
+
     // Configurar UI de administrador
     displayAdminInfo(userData);
     setupLogout();
     loadPendingReports();
-    
+
     // Inicializar la aplicación de sitios turísticos
     const sitiosApp = new SitiosTuristicosApp();
     sitiosApp.init();
@@ -117,6 +144,76 @@ class SitiosTuristicosApp {
         document.getElementById('confirm-cancel').addEventListener('click', () => {
             this.closeModal('confirm-modal');
         });
+
+        // Evento para analizar imagen cuando se ingresa una URL
+        document.getElementById('sitio-imagen').addEventListener('input', (e) => {
+            const imageUrl = e.target.value.trim();
+            const previewContainer = document.getElementById('image-preview');
+            const previewImg = document.getElementById('image-preview-img');
+
+            if (imageUrl && imageUrl.startsWith('http')) {
+                previewImg.src = imageUrl;
+                previewContainer.style.display = 'block';
+
+                // Verificar si la imagen se carga correctamente
+                previewImg.onload = function () {
+                    previewContainer.style.display = 'block';
+                };
+                previewImg.onerror = function () {
+                    previewContainer.style.display = 'none';
+                };
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        });
+
+        // Evento para analizar imagen cuando se ingresa una URL
+        document.getElementById('sitio-imagen').addEventListener('blur', async (e) => {
+            const imageUrl = e.target.value.trim();
+            if (imageUrl && imageUrl.startsWith('http')) {
+                const descriptionField = document.getElementById('sitio-descripcion');
+                const currentDesc = descriptionField.value.trim();
+                const analyzingStatus = document.getElementById('analyzing-status');
+
+                // Solo analizar si no hay descripción existente
+                if (!currentDesc) {
+                    try {
+                        // Mostrar estado de análisis
+                        analyzingStatus.style.display = 'flex';
+
+                        const result = await analyzeImage(imageUrl);
+                        if (result) {
+                            let description = '';
+
+                            // Usar la descripción generada por Azure
+                            if (result.description && result.description.captions.length > 0) {
+                                description = result.description.captions[0].text;
+                            }
+
+                            // Agregar tags relevantes
+                            if (result.tags && result.tags.length > 0) {
+                                const relevantTags = result.tags
+                                    .filter(tag => tag.confidence > 0.7)
+                                    .map(tag => tag.name);
+
+                                if (relevantTags.length > 0) {
+                                    description += `\n\nElementos en la imagen: ${relevantTags.join(', ')}`;
+                                }
+                            }
+
+                            if (description) {
+                                descriptionField.value = description.charAt(0).toUpperCase() + description.slice(1);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error al analizar imagen:', error);
+                    } finally {
+                        // Ocultar estado de análisis
+                        analyzingStatus.style.display = 'none';
+                    }
+                }
+            }
+        });
     }
 
     debouncedSearch = this.debounce(() => {
@@ -125,7 +222,7 @@ class SitiosTuristicosApp {
 
     debounce(func, wait) {
         let timeout;
-        return function() {
+        return function () {
             const context = this;
             const args = arguments;
             clearTimeout(timeout);
@@ -163,14 +260,14 @@ class SitiosTuristicosApp {
 
     displaySitios(sitios) {
         const sitiosList = document.getElementById('sitios-list');
-        
+
         if (sitios.length === 0) {
             sitiosList.innerHTML = '<div class="text-center py-3">No se encontraron sitios turísticos</div>';
             return;
         }
 
         sitiosList.innerHTML = '';
-        
+
         sitios.forEach(sitio => {
             const sitioCard = document.createElement('div');
             sitioCard.className = 'sitio-card';
@@ -192,7 +289,7 @@ class SitiosTuristicosApp {
                     </div>
                 </div>
             `;
-            
+
             sitiosList.appendChild(sitioCard);
         });
 
@@ -224,9 +321,18 @@ class SitiosTuristicosApp {
             document.getElementById('sitio-ubicacion').value = sitio.ubicacion;
             document.getElementById('sitio-imagen').value = sitio.imagenPrincipal;
             document.getElementById('sitio-hotel').value = sitio.hotelId || '';
+            
+            // Mostrar vista previa si hay imagen
+            if (sitio.imagenPrincipal) {
+                const previewContainer = document.getElementById('image-preview');
+                const previewImg = document.getElementById('image-preview-img');
+                previewImg.src = sitio.imagenPrincipal;
+                previewContainer.style.display = 'block';
+            }
         } else {
             document.getElementById('modal-title').textContent = 'Nuevo Sitio Turístico';
             form.reset();
+            document.getElementById('image-preview').style.display = 'none';
         }
         
         this.populateHotelSelect();
@@ -236,7 +342,7 @@ class SitiosTuristicosApp {
     populateHotelSelect() {
         const select = document.getElementById('sitio-hotel');
         select.innerHTML = '<option value="">Seleccione un hotel</option>';
-        
+
         this.hoteles.forEach(hotel => {
             const option = document.createElement('option');
             option.value = hotel.id;
@@ -253,7 +359,7 @@ class SitiosTuristicosApp {
         const form = document.getElementById('sitio-form');
         const id = document.getElementById('sitio-id').value;
         const isNew = !id;
-        
+
         const sitioData = {
             nombre: document.getElementById('sitio-nombre').value,
             descripcion: document.getElementById('sitio-descripcion').value,
@@ -270,7 +376,7 @@ class SitiosTuristicosApp {
             };
 
             let response;
-            
+
             if (isNew) {
                 response = await fetch('http://localhost:8080/api/sitios-turisticos', {
                     method: 'POST',
@@ -301,7 +407,7 @@ class SitiosTuristicosApp {
         try {
             const response = await fetch(`http://localhost:8080/api/sitios-turisticos/${id}`);
             if (!response.ok) throw new Error('Error al cargar el sitio turístico');
-            
+
             const sitio = await response.json();
             this.openSitioModal(sitio);
         } catch (error) {
@@ -312,7 +418,7 @@ class SitiosTuristicosApp {
     confirmDelete(id) {
         const modal = document.getElementById('confirm-modal');
         modal.style.display = 'flex';
-        
+
         document.getElementById('confirm-ok').onclick = () => {
             this.deleteSitio(id);
             modal.style.display = 'none';
@@ -332,7 +438,7 @@ class SitiosTuristicosApp {
             });
 
             if (!response.ok) throw new Error('Error al eliminar el sitio turístico');
-            
+
             this.loadSitiosTuristicos();
         } catch (error) {
             handleApiError(error);

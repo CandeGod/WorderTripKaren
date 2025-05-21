@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="sitios.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -24,7 +26,8 @@
                     <li><a href="../../index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="../eventos/eventos.html"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
                     <li><a href="../paquetes/paquetes.html"><i class="fas fa-suitcase"></i> Paquetes</a></li>
-                    <li class="active"><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios Turísticos</a></li>
+                    <li class="active"><a href="../sitios/sitios.html"><i class="fas fa-map-marked-alt"></i> Sitios
+                            Turísticos</a></li>
                     <li><a href="../tours/tours.html"><i class="fas fa-route"></i> Tours</a></li>
                     <li><a href="../hoteles/hoteles.html"><i class="fas fa-hotel"></i> Hoteles</a></li>
                     <li><a href="../compras/compras.html"><i class="fas fa-shopping-cart"></i> Compras</a></li>
@@ -100,6 +103,25 @@
                     <input type="text" class="form-control" id="sitio-nombre" required>
                 </div>
 
+                <!-- Modificar dentro del modal #sitio-modal -->
+                <div class="mb-3">
+                    <label for="sitio-imagen" class="form-label">URL de la imagen principal</label>
+                    <input type="url" class="form-control" id="sitio-imagen"
+                        placeholder="https://example.com/image.jpg">
+                    <small class="text-muted">Ingrese una URL válida para ver la vista previa y generar descripción
+                        automática</small>
+                    <div class="image-preview-container mt-2" id="image-preview" style="display: none;">
+                        <img id="image-preview-img" src="" alt="Vista previa" class="img-thumbnail"
+                            style="max-height: 200px;">
+                    </div>
+                    <div class="analyzing-status mt-2" id="analyzing-status" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <span class="ms-2">Analizando imagen para generar descripción...</span>
+                    </div>
+                </div>
+
                 <div class="mb-3">
                     <label for="sitio-descripcion" class="form-label">Descripción</label>
                     <textarea class="form-control" id="sitio-descripcion" rows="3" required></textarea>
@@ -108,11 +130,6 @@
                 <div class="mb-3">
                     <label for="sitio-ubicacion" class="form-label">Ubicación</label>
                     <input type="text" class="form-control" id="sitio-ubicacion" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="sitio-imagen" class="form-label">URL de la imagen principal</label>
-                    <input type="url" class="form-control" id="sitio-imagen" placeholder="https://example.com/image.jpg">
                 </div>
 
                 <div class="mb-3">
@@ -144,4 +161,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="sitios.js" type="module"></script>
 </body>
+
 </html>

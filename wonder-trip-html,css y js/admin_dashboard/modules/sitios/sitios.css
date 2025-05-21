@@ -399,3 +399,37 @@ body {
         width: 95%;
     }
 }
+
+/* Agregar al archivo sitios.css */
+
+/* Estilos para vista previa de imagen */
+.image-preview-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.image-preview-container img {
+    max-width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para el estado de análisis */
+.analyzing-status {
+    display: flex;
+    align-items: center;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    padding: 8px;
+    background-color: rgba(0, 132, 227, 0.1);
+    border-radius: 4px;
+}
+
+/* Estilos para el campo de imagen */
+#sitio-imagen {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%230984e3" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.17 1.821l-3.257-3.256a.5.5 0 0 0-.708 0l-3.256 3.256a2 2 0 0 1-.115.1zM2 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H2zm9 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    padding-right: 35px;
+}
